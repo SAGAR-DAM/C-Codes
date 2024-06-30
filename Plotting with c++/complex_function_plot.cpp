@@ -12,16 +12,15 @@ complex f(complex c)
     // z = complex::addcomplex(z,complex(-1,0));
     // z = complex::addcomplex(z,complex::divcomplex(complex(1,0),c));
 
-    complex z = complex::logcomplex(c);
+    complex z = complex::logcomplex(complex::sincomplex(c));
 
     return z;
 }
 
 
 int main() {
-    int X_gridSize = 1001, Y_gridSize = 1001; // Define the resolution of the grid
-    double xMin = -10.0, xMax = 10.0;
-    double yMin = -10.0, yMax = 10.0;
+    int X_gridSize = 301, Y_gridSize = 301; // Define the resolution of the grid
+    double xMin = -10.0, xMax = 10.0, yMin = -10.0, yMax = 10.0; // Define the axis range. 
 
     // Create a file to store the data
     std::ofstream dataFile("data.txt");
@@ -64,7 +63,7 @@ int main() {
 
     gnuplotScript << "set xlabel 'x'\n";
     gnuplotScript << "set ylabel 'y'\n";
-    gnuplotScript << "set cblabel 'z'\n";
+    gnuplotScript << "set cblabel 'f(z)'\n";
     gnuplotScript << "set xtics font ',10'\n"; // Set smaller font for ticks and labels
     gnuplotScript << "set ytics font ',10'\n";
     gnuplotScript << "set xlabel 'x' font ',10'\n";
@@ -73,7 +72,7 @@ int main() {
     gnuplotScript << "set cbtics font ',10'\n";
     gnuplotScript << "set xrange [" << xMin << ":" << xMax << "]\n";
     gnuplotScript << "set yrange [" << yMin << ":" << yMax << "]\n";
-    gnuplotScript << "set title 'contour complex plot of f(z) = |ln(z)|; z=x+jy' font ',10'\n";
+    gnuplotScript << "set title 'contour complex plot of f(z) = |ln(sin z)|; z=x+jy' font ',10'\n";
     gnuplotScript << "unset key\n"; // Disable the plot key (legend)
     gnuplotScript << "splot 'data.txt' using 1:2:3 with image\n";
     gnuplotScript.close();
