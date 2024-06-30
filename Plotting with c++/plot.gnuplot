@@ -24,6 +24,6 @@ set cblabel 'z' font ',10'
 set cbtics font ',10'
 set xrange [-10:10]
 set yrange [-10:10]
-set title 'contour plot' font ',10'
+set title 'contour complex plot of f(z) = |ln(z)|; z=x+jy' font ',10'
 unset key
 splot 'data.txt' using 1:2:3 with image

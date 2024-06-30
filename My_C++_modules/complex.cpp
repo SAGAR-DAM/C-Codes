@@ -62,6 +62,12 @@ double complex::abscomplex(complex c)
     return pow((c.getreal()*c.getreal()+c.getimag()*c.getimag()),0.5);
 }
 
+float complex::argcomplex(complex c)
+{   
+    c.rect_to_polar();
+    return c.theta; 
+}
+
 complex complex::addcomplex(complex c1, complex c2)
 {
     return complex(c1.real + c2.real, c1.imag + c2.imag);

@@ -73,7 +73,7 @@ int main() {
     gnuplotScript << "set cbtics font ',10'\n";
     gnuplotScript << "set xrange [" << xMin << ":" << xMax << "]\n";
     gnuplotScript << "set yrange [" << yMin << ":" << yMax << "]\n";
-    gnuplotScript << "set title 'contour plot' font ',10'\n";
+    gnuplotScript << "set title 'contour complex plot of f(z) = |ln(z)|; z=x+jy' font ',10'\n";
     gnuplotScript << "unset key\n"; // Disable the plot key (legend)
     gnuplotScript << "splot 'data.txt' using 1:2:3 with image\n";
     gnuplotScript.close();

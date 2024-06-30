@@ -21,9 +21,14 @@ int main()
     // c.getcomplex_polar();
 
     // abs complex:
+    // complex c=complex(1,1);
+    // double absc = complex::abscomplex(c);
+    // cout<<absc;
+
+    // abs complex:
     complex c=complex(1,1);
-    double absc = complex::abscomplex(c);
-    cout<<absc;
+    double argc = complex::argcomplex(c);
+    cout<<argc;
 
     // add two complex number:
     //________________________________________
