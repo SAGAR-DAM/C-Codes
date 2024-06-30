@@ -20,6 +20,11 @@ int main()
     // complex c=complex(1,1);
     // c.getcomplex_polar();
 
+    // abs complex:
+    complex c=complex(1,1);
+    double absc = complex::abscomplex(c);
+    cout<<absc;
+
     // add two complex number:
     //________________________________________
     // complex c1 = complex(2,4), c2 = complex(5,-1);

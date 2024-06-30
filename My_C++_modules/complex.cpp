@@ -57,6 +57,11 @@ void complex::getcomplex_polar()
     cout << "The complex number in polar form: " << r << " exp(" << theta << "j)" << endl;
 }
 
+double complex::abscomplex(complex c)
+{
+    return pow((c.getreal()*c.getreal()+c.getimag()*c.getimag()),0.5);
+}
+
 complex complex::addcomplex(complex c1, complex c2)
 {
     return complex(c1.real + c2.real, c1.imag + c2.imag);

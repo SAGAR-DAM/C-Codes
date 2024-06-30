@@ -25,6 +25,7 @@ public:
     void getcomplex();
     void getcomplex_polar();
 
+    static double abscomplex(complex c);
     static complex addcomplex(complex c1, complex c2);
     static complex subtractcomplex(complex c1, complex c2);
     static complex multcomplex(complex c1, complex c2);
