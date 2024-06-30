@@ -33,7 +33,7 @@ int main() {
             double y = yMin + j * y_step;
             complex c = complex(x,y);
             complex z = f(c);
-            double z_r = complex::abscomplex(z);
+            double z_r = z.get_r();//complex::abscomplex(z);
             dataFile << x << " " << y << " " << z_r << "\n";
         }
         dataFile << "\n";

@@ -20,15 +20,19 @@ int main()
     // complex c=complex(1,1);
     // c.getcomplex_polar();
 
+    // complex no abs and arg:
+    // complex c = complex(1,1);
+    // cout<<"abs: "<<c.get_r()<<" ; arg: "<<c.get_theta();
+
     // abs complex:
     // complex c=complex(1,1);
     // double absc = complex::abscomplex(c);
     // cout<<absc;
 
     // abs complex:
-    complex c=complex(1,1);
-    double argc = complex::argcomplex(c);
-    cout<<argc;
+    // complex c=complex(1,1);
+    // double argc = complex::argcomplex(c);
+    // cout<<argc;
 
     // add two complex number:
     //________________________________________
@@ -43,7 +47,7 @@ int main()
     // c3.getcomplex();
 
     // multiply two complex number:
-    //________________________________________
+    // ________________________________________
     // complex c1 = complex(2,4), c2 = complex(5,-1);
     // complex c3 = complex::multcomplex(c1,c2);
     // c3.getcomplex();
@@ -107,11 +111,11 @@ int main()
 
     // log of complex number:
     // ________________________________________
-    // complex c = complex(2,-5);
-    // complex c1 = complex::logcomplex(c);
-    // cout<<"log(c): ";
-    // c1.getcomplex();
-    // c1.getcomplex_polar();
+    complex c = complex(1.414,1.414);
+    complex c1 = complex::logcomplex(c);
+    cout<<"log(c): ";
+    c1.getcomplex();
+    c1.getcomplex_polar();
 
     // asin, acos, atan, ... of complex number:
     // ________________________________________

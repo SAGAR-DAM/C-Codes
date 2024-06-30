@@ -5,17 +5,17 @@ using namespace std;
 // Constructor
 complex::complex(double r, double i) : real(r), imag(i) {}
 
-void complex::rect_to_polar()
-{
-    r = sqrt(real * real + imag * imag);
-    theta = atan2(imag, real);
-}
+// void complex::rect_to_polar()
+// {
+//     r = sqrt(real * real + imag * imag);
+//     theta = atan2(imag, real);
+// }
 
-void complex::polar_to_rect()
-{
-    real = r * cos(theta);
-    imag = r * sin(theta);
-}
+// void complex::polar_to_rect()
+// {
+//     real = r * cos(theta);
+//     imag = r * sin(theta);
+// }
 
 double complex::getreal()
 {
@@ -27,15 +27,13 @@ double complex::getimag()
     return imag;
 }
 
-double complex::get_r(complex c)
+double complex::get_r()
 {
-    c.rect_to_polar();
     return r;
 }
 
-float complex::get_theta(complex c)
+float complex::get_theta()
 {
-    c.rect_to_polar();
     return theta;
 }
 
@@ -53,7 +51,7 @@ void complex::getcomplex()
 
 void complex::getcomplex_polar()
 {
-    rect_to_polar();
+    //rect_to_polar();
     cout << "The complex number in polar form: " << r << " exp(" << theta << "j)" << endl;
 }
 
@@ -64,7 +62,7 @@ double complex::abscomplex(complex c)
 
 float complex::argcomplex(complex c)
 {   
-    c.rect_to_polar();
+    //c.rect_to_polar();
     return c.theta; 
 }
 
@@ -80,8 +78,8 @@ complex complex::subtractcomplex(complex c1, complex c2)
 
 complex complex::multcomplex(complex c1, complex c2)
 {
-    c1.rect_to_polar();
-    c2.rect_to_polar();
+    //c1.rect_to_polar();
+    //c2.rect_to_polar();
     double r_mult = c1.r * c2.r;
     float theta_mult = (c1.theta + c2.theta);
 
@@ -102,8 +100,8 @@ complex complex::multcomplex(complex c1, complex c2)
 
 complex complex::divcomplex(complex c1, complex c2)
 {
-    c1.rect_to_polar();
-    c2.rect_to_polar();
+    //c1.rect_to_polar();
+    //c2.rect_to_polar();
     double r_div = c1.r / c2.r;
     float theta_div = (c1.theta - c2.theta);
 
@@ -124,7 +122,7 @@ complex complex::divcomplex(complex c1, complex c2)
 
 complex complex::complex_exponenciation(complex c, float n)
 {
-    c.rect_to_polar();
+    //c.rect_to_polar();
     double r_exp = pow(c.r, n);
     float theta_exp = n * c.theta;
 
@@ -135,8 +133,8 @@ complex complex::complex_exponenciation(complex c, float n)
 
 complex complex::complexpow(complex c1, complex c2)
 {
-    c1.rect_to_polar();
-    c2.rect_to_polar();
+    //c1.rect_to_polar();
+    //c2.rect_to_polar();
     double r1 = c1.r, r2 = c2.r;
     float theta1 = c1.theta, theta2 = c2.theta;
 
@@ -158,7 +156,7 @@ complex complex::sincomplex(complex c)
 {
     double real_sin = sin(c.real)*cosh(c.imag), imag_sin = cos(c.real)*sinh(c.imag);
     complex c_sin = complex(real_sin, imag_sin);
-    c_sin.rect_to_polar();
+    //c_sin.rect_to_polar();
     return c_sin;
 }
 
@@ -166,7 +164,7 @@ complex complex::coscomplex(complex c)
 {
     double real_cos = cos(c.real)*cosh(c.imag), imag_cos = -sin(c.real)*sinh(c.imag);
     complex c_cos = complex(real_cos, imag_cos);
-    c_cos.rect_to_polar();
+    //c_cos.rect_to_polar();
     return c_cos;
 }
 
@@ -196,7 +194,7 @@ complex complex::cotcomplex(complex c)
 
 complex complex::logcomplex(complex c)
 {
-    c.rect_to_polar();
+    //c.rect_to_polar();
     double real_log = log(c.r), imag_log = c.theta;
     complex c_log = complex(real_log,imag_log);
     return c_log;

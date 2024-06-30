@@ -8,20 +8,20 @@ class complex
 {
 private:
     double real, imag;
-    double r;
-    float theta;
+    double r = sqrt(real * real + imag * imag);
+    float theta = atan2(imag, real);
     //const complex iota;
 
 public:
     // Constructor
     complex(double r, double i);
 
-    void rect_to_polar();
-    void polar_to_rect();
+    //void rect_to_polar();
+    //void polar_to_rect();
     double getreal();
     double getimag();
-    double get_r(complex c);
-    float get_theta(complex c);
+    double get_r();
+    float get_theta();
     void getcomplex();
     void getcomplex_polar();
 
