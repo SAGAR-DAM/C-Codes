@@ -111,11 +111,11 @@ int main()
 
     // log of complex number:
     // ________________________________________
-    complex c = complex(1.414,1.414);
-    complex c1 = complex::logcomplex(c);
-    cout<<"log(c): ";
-    c1.getcomplex();
-    c1.getcomplex_polar();
+    // complex c = complex(1.414,1.414);
+    // complex c1 = complex::logcomplex(c);
+    // cout<<"log(c): ";
+    // c1.getcomplex();
+    // c1.getcomplex_polar();
 
     // asin, acos, atan, ... of complex number:
     // ________________________________________

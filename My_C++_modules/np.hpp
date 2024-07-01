@@ -1,5 +1,7 @@
-#ifndef COMPLEX_HPP
-#define COMPLEX_HPP
+// np.h
+
+#ifndef NP_H  // Include guards to prevent multiple inclusion
+#define NP_H
 
 #include<iostream>
 #include<string>
@@ -7,6 +9,23 @@
 #include<vector>
 #include<algorithm>
 #include <cmath>
+
+using namespace std;
+
+// FUNCTION DECLARATION:
+int find_index(const std::vector<double>& array, double value);
+int find_closest_index(const std::vector<double>& array, double value);
+std::vector<double> cutarr(std::vector<double> array, int minw, int maxw);
+double meanarr(const std::vector<double>& vec);
+double stdarr(const std::vector<double>& vec);
+
+
+
+
+
+
+
+// CLASS DECLARATION:
 class complex
 {
 private:
@@ -50,6 +69,7 @@ public:
     static complex acsccomplex(complex c);
     static complex aseccomplex(complex c);
     static complex acotcomplex(complex c);
+
 };
 
 // Complex operator definition outside the class
@@ -60,4 +80,5 @@ complex operator/(complex& c1, complex& c2);
 complex operator^(complex& c1, complex& c2);
 std::ostream& operator<<(std::ostream& os, complex& c);
 
-#endif // COMPLEX_HPP
+
+#endif // np.h

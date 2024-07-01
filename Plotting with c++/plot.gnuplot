@@ -15,15 +15,15 @@ set palette defined ( \
 1 0.5 0 0 )
 set xlabel 'x'
 set ylabel 'y'
-set cblabel 'f(z)'
+set cblabel 'z'
 set xtics font ',10'
 set ytics font ',10'
 set xlabel 'x' font ',10'
 set ylabel 'y' font ',10'
 set cblabel 'z' font ',10'
 set cbtics font ',10'
-set xrange [-10:10]
-set yrange [-10:10]
-set title 'contour complex plot of f(z) = |ln(sin z)|; z=x+jy' font ',10'
+set xrange [-20:20]
+set yrange [-20:20]
+set title 'contour plot' font ',10'
 unset key
 splot 'data.txt' using 1:2:3 with image

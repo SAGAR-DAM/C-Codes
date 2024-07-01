@@ -1,177 +1,188 @@
-#include <iostream>
-#include <vector>
-#include <cmath>
-#include <fstream>
+#include<iostream>
+#include<string>
+#include<limits>
+#include<vector>
+#include<algorithm>
+#include "D:\C++ codes\My_C++_modules\np.hpp"
+#include <stdexcept> // For std::invalid_argument
+
 using namespace std;
 
+class Matrix {
+private:
+    std::vector<std::vector<double>> data;
+    size_t rows;
+    size_t cols;
 
-// temp: 1
+public:
+    // Constructors
+    Matrix(size_t rows, size_t cols, double initial = 0.0)
+        : rows(rows), cols(cols), data(std::vector<std::vector<double>>(rows, std::vector<double>(cols, initial))) {}
 
-// void print_arr(std::vector<double> vect)
-// {
-//     for (int i = 0; i < vect.size(); ++i) 
-//     {
-//        cout<<vect[i]<<" ";
-//     }
-    
-// }
+    // Accessors
+    size_t numRows() const { return rows; }
+    size_t numCols() const { return cols; }
 
-// int main() {
-//     int size;
-//     std::cout << "Enter the size of the array: ";
-//     std::cin >> size;
+    // Element access
+    double& operator()(size_t row, size_t col) {
+        if (row >= rows || col >= cols) {
+            throw std::out_of_range("Matrix indices out of range");
+        }
+        return data[row][col];
+    }
 
-//     // Create a dynamic array using std::vector
-//     std::vector<double> dynamicArray(size);
+    double operator()(size_t row, size_t col) const {
+        if (row >= rows || col >= cols) {
+            throw std::out_of_range("Matrix indices out of range");
+        }
+        return data[row][col];
+    }
 
-//     // Initialize array elements
-//     for (int i = 0; i < size; ++i) {
-//         dynamicArray[i] = pow(i,2);
-//     }
+    // Matrix addition
+    Matrix operator+(const Matrix& other) const {
+        if (rows != other.rows || cols != other.cols) {
+            throw std::invalid_argument("Matrix dimensions must match for addition");
+        }
+        Matrix result(rows, cols);
+        for (size_t i = 0; i < rows; ++i) {
+            for (size_t j = 0; j < cols; ++j) {
+                result(i, j) = data[i][j] + other(i, j);
+            }
+        }
+        return result;
+    }
 
-//     print_arr(dynamicArray);
-//     std::cout << std::endl;
+    // Matrix subtraction
+    Matrix operator-(const Matrix& other) const {
+        if (rows != other.rows || cols != other.cols) {
+            throw std::invalid_argument("Matrix dimensions must match for subtraction");
+        }
+        Matrix result(rows, cols);
+        for (size_t i = 0; i < rows; ++i) {
+            for (size_t j = 0; j < cols; ++j) {
+                result(i, j) = data[i][j] - other(i, j);
+            }
+        }
+        return result;
+    }
 
-//     return 0;
-// }
+    // Scalar multiplication
+    Matrix operator*(double scalar) const {
+        Matrix result(rows, cols);
+        for (size_t i = 0; i < rows; ++i) {
+            for (size_t j = 0; j < cols; ++j) {
+                result(i, j) = data[i][j] * scalar;
+            }
+        }
+        return result;
+    }
 
+    // Scalar division
+    Matrix operator/(double scalar) const {
+        if (scalar == 0.0) {
+            throw std::invalid_argument("Division by zero");
+        }
+        Matrix result(rows, cols);
+        for (size_t i = 0; i < rows; ++i) {
+            for (size_t j = 0; j < cols; ++j) {
+                result(i, j) = data[i][j] / scalar;
+            }
+        }
+        return result;
+    }
 
+    // Matrix multiplication
+    Matrix operator*(const Matrix& other) const {
+        if (cols != other.rows) {
+            throw std::invalid_argument("Matrix dimensions are incompatible for multiplication");
+        }
+        Matrix result(rows, other.cols);
+        for (size_t i = 0; i < rows; ++i) {
+            for (size_t j = 0; j < other.cols; ++j) {
+                double sum = 0.0;
+                for (size_t k = 0; k < cols; ++k) {
+                    sum += data[i][k] * other(k, j);
+                }
+                result(i, j) = sum;
+            }
+        }
+        return result;
+    }
 
-// temp 2:
+    // Matrix exponentiation (only for square matrices and positive integer exponents)
+    Matrix operator^(int exp) const {
+        if (rows != cols) {
+            throw std::invalid_argument("Matrix must be square for exponentiation");
+        }
+        if (exp < 0) {
+            throw std::invalid_argument("Exponent must be non-negative");
+        }
+        Matrix result(rows, cols);
+        Matrix base = *this;
+        result.identity(); // Initialize result as identity matrix
+        while (exp > 0) {
+            if (exp % 2 == 1) {
+                result = result * base;
+            }
+            base = base * base;
+            exp /= 2;
+        }
+        return result;
+    }
 
+    // Helper function to initialize as identity matrix (for exponentiation)
+    void identity() {
+        for (size_t i = 0; i < rows; ++i) {
+            for (size_t j = 0; j < cols; ++j) {
+                if (i == j) {
+                    data[i][j] = 1.0;
+                } else {
+                    data[i][j] = 0.0;
+                }
+            }
+        }
+    }
 
-// int main() {
-//     std::ofstream data("plot_data.dat");
-//     for (float x = -5.0; x <= 5.0; x += 0.1) {
-//         float y = sin(x);
-//         data << x << " " << y << "\n";
-//     }
-//     data.close();
-
-//     FILE *gnuplotPipe = popen("gnuplot -persistent", "w");
-//     fprintf(gnuplotPipe, "plot 'plot_data.dat' with lines\n");
-//     fflush(gnuplotPipe);
-
-//     std::cout << "Press enter to exit..." << std::endl;
-//     std::cin.get();
-//     return 0;
-// }
-
-
-
-// temp 3;
-// #include <iostream>
-// #include <fstream>
-// #include <cmath>
-// #include <cstdio> // For remove function
-
-// int main() {
-//     // Generate data for y = sin(x)
-//     std::ofstream data1("data_sin.dat");
-//     for (double x = -20.0; x <= 20.0; x += 0.01) {
-//         double y = sin(x);
-//         data1 << x << " " << y << "\n";
-//     }
-//     data1.close();
-
-//     // Generate data for y = exp(cos(x))
-//     std::ofstream data2("data_exp_cos.dat");
-//     for (double x = -20.0; x <= 20.0; x += 0.01) {
-//         double y = exp(cos(x));
-//         data2 << x << " " << y << "\n";
-//     }
-//     data2.close();
-    
-
-//     // Open a pipe to GNUPLOT
-//     FILE *gnuplotPipe = popen("gnuplot -persistent", "w");
-//     if (gnuplotPipe) {
-//         // Send plotting commands to GNUPLOT
-//         fprintf(gnuplotPipe, "set title 'Multiplot Example'\n");
-//         fprintf(gnuplotPipe, "set xlabel 'x'\n");
-//         fprintf(gnuplotPipe, "set ylabel 'y'\n");
-//         fprintf(gnuplotPipe, "set grid\n");
-//         fprintf(gnuplotPipe, "plot 'data_sin.dat' title 'y = sin(x)' with lines linecolor rgb 'green' linewidth 2, ");
-//         fprintf(gnuplotPipe, "'data_exp_cos.dat' title 'y = exp(cos(x))' with linespoints pointtype 7 pointsize 1 linecolor rgb 'red' linewidth 2\n");
-//         fflush(gnuplotPipe);
-
-//         // Wait for the user to close the plot window
-//         std::cout << "Press enter to exit..." << std::endl;
-//         std::cin.get();
-
-//         // Close the pipe to GNUPLOT
-//         pclose(gnuplotPipe);
-
-//         // Delete the data files
-//         if (remove("data_sin.dat") != 0) {
-//             std::cerr << "Error deleting data_sin.dat" << std::endl;
-//         } else {
-//             std::cout << "Deleted data_sin.dat" << std::endl;
-//         }
-
-//         if (remove("data_exp_cos.dat") != 0) {
-//             std::cerr << "Error deleting data_exp_cos.dat" << std::endl;
-//         } else {
-//             std::cout << "Deleted data_exp_cos.dat" << std::endl;
-//         }
-//     } 
-    
-//     else {
-//         std::cerr << "Error: Could not open pipe to GNUPLOT." << std::endl;
-//     }
-
-//     return 0;
-// }
-
-// temp 4:
-#include <iostream>
-#include <fstream>
-#include <cmath>
-#include <cstdio> // For popen function
+    // Output operator
+    friend std::ostream& operator<<(std::ostream& os, const Matrix& matrix) {
+        for (size_t i = 0; i < matrix.rows; ++i) {
+            for (size_t j = 0; j < matrix.cols; ++j) {
+                os << matrix(i, j) << " ";
+            }
+            os << "\n";
+        }
+        return os;
+    }
+};
 
 int main() {
-    // Generate surface data
-    std::ofstream data("surface_data.dat");
-    for (double x = -5.0; x <= 5.0; x += 0.1) {
-        for (double y = -5.0; y <= 5.0; y += 0.1) {
-            double z = exp(-x*x-y*y)*sin(0.2*(x*x+y*y));
-            data << x << " " << y << " " << z << "\n";
-        }
-        data << "\n";
-    }
-    data.close();
+    // Example usage
+    Matrix A(2, 2, 1.0);
+    Matrix B(2, 2, 2.0);
 
-    // Write GNUPLOT script
-    std::ofstream gp_script("plot_surface.gp");
-    gp_script << "set title 'Interactive Surface Plot'\n";
-    gp_script << "set xlabel 'x'\n";
-    gp_script << "set ylabel 'y'\n";
-    gp_script << "set zlabel 'z'\n";
-    gp_script << "set pm3d\n";
-    gp_script << "set hidden3d\n";
-    gp_script << "splot 'surface_data.dat' with lines\n";
-    gp_script.close();
+    std::cout << "Matrix A:\n" << A << std::endl;
+    std::cout << "Matrix B:\n" << B << std::endl;
 
-    // Execute GNUPLOT script
-    FILE *gnuplotPipe = popen("gnuplot", "w");
-    if (gnuplotPipe) {
-        fprintf(gnuplotPipe, "load 'plot_surface.gp'\n");
-        fflush(gnuplotPipe);
+    Matrix C = A + B;
+    Matrix D = A - B;
+    Matrix E = A * 2.0;
+    Matrix F = A / 2.0;
+    Matrix G = A * B;
 
-        std::cout << "Press enter to exit..." << std::endl;
-        std::cin.get();
+    std::cout << "Matrix C (A + B):\n" << C << std::endl;
+    std::cout << "Matrix D (A - B):\n" << D << std::endl;
+    std::cout << "Matrix E (A * 2.0):\n" << E << std::endl;
+    std::cout << "Matrix F (A / 2.0):\n" << F << std::endl;
+    std::cout << "Matrix G (A * B):\n" << G << std::endl;
 
-        pclose(gnuplotPipe);
-    } else {
-        std::cerr << "Error: Could not open pipe to GNUPLOT." << std::endl;
-    }
-
-    // Optionally, delete the data file
-    if (remove("surface_data.dat") != 0) {
-        std::cerr << "Error deleting surface_data.dat" << std::endl;
-    } else {
-        std::cout << "Deleted surface_data.dat" << std::endl;
-    }
+    // Example of matrix exponentiation (A^2)
+    Matrix H(2, 2);
+    H(0, 0) = 1.0;
+    H(0, 1) = 2.0;
+    H(1, 0) = 3.0;
+    H(1, 1) = 4.0;
+    Matrix I = H ^ 2;
+    std::cout << "Matrix I (H^2):\n" << I << std::endl;
 
     return 0;
 }

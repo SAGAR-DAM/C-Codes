@@ -4,14 +4,18 @@
 
 // Function to compute z = sin(x^2 + y^2) * exp(-(x^2 + y^2))
 double computeZ(double x, double y) {
-    double r2 = x * x + y * y;
-    return sin(r2) / r2;
+    // double r2 = x * x + y * y;
+    // return sin(r2) / r2;
+
+    double z=sqrt(x*x+y*y)+3*cos(sqrt(x*x+y*y))+5;
+
+    return z;
 }
 
 int main() {
     int X_gridSize = 501, Y_gridSize = 501; // Define the resolution of the grid
-    double xMin = -10.0, xMax = 10.0;
-    double yMin = -10.0, yMax = 10.0;
+    double xMin = -20, xMax = 20;
+    double yMin = -20, yMax = 20;
 
     // Create a file to store the data
     std::ofstream dataFile("data.txt");

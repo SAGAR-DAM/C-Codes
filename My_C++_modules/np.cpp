@@ -3,25 +3,138 @@
 #include<limits>
 #include<vector>
 #include<algorithm>
-#include "D:\C++ codes\My_C++_modules\complex.hpp"
+#include "D:\C++ codes\My_C++_modules\np.hpp"
 
 using namespace std;
 
-// Constructor
+/*-------------------------------------------------------------------------- */
+/*-------------------------------------------------------------------------- */
+/*-------------------------------------------------------------------------- */
+//                          FUNCTION DECLARATION:
+/*-------------------------------------------------------------------------- */
+/*-------------------------------------------------------------------------- */
+/*-------------------------------------------------------------------------- */
+
+
+
+// ###########################################################################
+//          Function to find the index of a value in a vector
+// ###########################################################################
+int find_index(const std::vector<double>& array, double value) {
+    // Iterate through the vector to find the value
+    for (int i = 0; i < array.size(); ++i) {
+        if (array[i] == value) {
+            return i; // Return the index if found
+        }
+    }
+    // Return -1 if the value is not found in the vector
+    cout<<"Item not found...\n";
+    return -1;
+}
+
+
+// ###########################################################################
+//  Function to find the index of the closest value in a vector of doubles
+// ###########################################################################
+int find_closest_index(const std::vector<double>& array, double value) {
+    // Check if the vector is empty
+    if (array.empty()) {
+        return -1; // Return -1 if the vector is empty
+    }
+
+    // Initialize variables to track the closest index and the minimum difference
+    int closestIndex = 0; // Assume the closest index is the first element initially
+    double minDifference = std::abs(array[0] - value); // Initialize with difference to first element
+
+    // Iterate through the vector to find the index of the closest value
+    for (int i = 1; i < array.size(); ++i) {
+        double difference = std::abs(array[i] - value);
+        if (difference < minDifference) {
+            minDifference = difference;
+            closestIndex = i;
+        }
+    }
+    //cout<<array[closestIndex]<<endl;
+    return closestIndex;
+}
+
+
+// ###########################################################################
+//                      cut array for given range
+// ###########################################################################
+std::vector<double> cutarr(std::vector<double> array, int minw, int maxw)
+{
+    vector<double> newarray(array.begin() + minw, array.begin()+maxw);
+    return newarray;
+}
+
+// ###########################################################################
+//           Function to calculate the mean of a vector of doubles
+// ###########################################################################
+double meanarr(const std::vector<double>& vec) {
+    // Check if the vector is empty to avoid division by zero
+    if (vec.empty()) {
+        return 0.0; // Return 0 if the vector is empty
+    }
+
+    // Calculate the sum of all elements in the vector
+    double sum = 0.0;
+    for (double num : vec) {
+        sum += num;
+    }
+
+    // Calculate the mean (average)
+    double mean = sum / vec.size();
+    return mean;
+}
+
+// ###########################################################################
+//      Function to calculate the standard deviation of a vector of doubles
+// ###########################################################################
+double stdarr(const std::vector<double>& vec) {
+    if (vec.empty()) {
+        return 0.0; // Return 0 if the vector is empty
+    }
+
+    double mean = meanarr(vec); // Calculate mean using the previously defined function
+
+    // Calculate sum of squared differences from the mean
+    double sumSquaredDiff = 0.0;
+    for (double num : vec) {
+        sumSquaredDiff += (num - mean) * (num - mean);
+    }
+
+    // Calculate variance
+    double variance = sumSquaredDiff / vec.size();
+
+    // Calculate standard deviation (square root of variance)
+    double stdDev = std::sqrt(variance);
+    return stdDev;
+}
+
+
+
+
+/*-------------------------------------------------------------------------- */
+/*-------------------------------------------------------------------------- */
+/*-------------------------------------------------------------------------- */
+//                             CLASS DECLARATION:
+/*-------------------------------------------------------------------------- */
+/*-------------------------------------------------------------------------- */
+/*-------------------------------------------------------------------------- */
+
+
+// ###########################################################################
+//                              COMPLEX CLASS
+// ###########################################################################
+
+// costructor of the class: 
+//----------------------------
 complex::complex(double r, double i) : real(r), imag(i) {}
 
-// void complex::rect_to_polar()
-// {
-//     r = sqrt(real * real + imag * imag);
-//     theta = atan2(imag, real);
-// }
 
-// void complex::polar_to_rect()
-// {
-//     real = r * cos(theta);
-//     imag = r * sin(theta);
-// }
-
+// Functions over the class:
+//-----------------------------
 double complex::getreal()
 {
     return real;
@@ -46,11 +159,11 @@ void complex::getcomplex()
 {
     if (imag >= 0)
     {
-        cout << "The Complex number is: " << real << " + " << imag << "j" << endl;
+        cout << "The complex number is: " << real << " + " << imag << "j" << endl;
     }
     else
     {
-        cout << "The Complex number is: " << real << " " << imag << "j" << endl;
+        cout << "The complex number is: " << real << " " << imag << "j" << endl;
     }
 }
 
@@ -251,6 +364,11 @@ complex complex::acotcomplex(complex c)
 }
 
 
+// Addition operator definition outside the class
+complex operator+(complex& c1, complex& c2) 
+{
+    return complex::addcomplex(c1,c2);
+}
 
 
 // Operators of the complex class:

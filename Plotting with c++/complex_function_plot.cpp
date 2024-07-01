@@ -27,9 +27,11 @@ int main() {
 
     // Generate data
     double x_step = (xMax - xMin) / X_gridSize, y_step = (yMax - yMin) / Y_gridSize;
-    for (int i = 0; i <= X_gridSize; ++i) {
+    for (int i = 0; i <= X_gridSize; ++i) 
+    {
         double x = xMin + i * x_step;
-        for (int j = 0; j <= Y_gridSize; ++j) {
+        for (int j = 0; j <= Y_gridSize; ++j) 
+        {
             double y = yMin + j * y_step;
             complex c = complex(x,y);
             complex z = f(c);
@@ -86,9 +88,12 @@ int main() {
     std::cin.get();
 
     // Delete the data files
-    if (remove("data.txt") != 0) {
+    if (remove("data.txt") != 0) 
+    {
         std::cerr << "Error deleting data.txt" << std::endl;
-    } else {
+    } 
+    else 
+    {
         std::cout << "Deleted data.txt" << std::endl;
     }
     return 0;
