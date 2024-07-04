@@ -156,7 +156,8 @@ public:
     static Matrix identity(int size) 
     {
         Matrix id(size, size);
-        for (int i = 0; i < size; ++i) {
+        for (int i = 0; i < size; ++i) 
+        {
             id[i][i] = 1.0;
         }
         return id;
@@ -175,7 +176,7 @@ public:
         return true;
     }
 
-    static Matrix invertMatrix(const Matrix& A) 
+    static Matrix invertMatrix(Matrix A) 
     {
         int n = A.getRows();
         if (n != A.getCols()) {
@@ -243,68 +244,196 @@ public:
     }
 
 
+    static pair<Matrix, Matrix> qrDecomposition(Matrix A) 
+    {
+        int n = A.getRows();
+        Matrix Q = Matrix::identity(n); // Initialize Q to identity matrix
+        Matrix R = A;
+
+        for (int k = 0; k < n - 1; ++k) {
+            Matrix H = Matrix::identity(n);
+            double norm_x = 0;
+            for (int i = k; i < n; ++i) {
+                norm_x += R[i][k] * R[i][k];
+            }
+            norm_x = sqrt(norm_x);
+
+            double rkk = R[k][k];
+            double s = (rkk >= 0) ? 1 : -1;
+            double u1 = rkk + s * norm_x;
+            double w = sqrt(2 * norm_x * (norm_x + abs(rkk)));
+            
+            for (int i = k; i < n; ++i) {
+                H[i][k] = R[i][k] / w;
+            }
+            H[k][k] = 1;
+
+            R = multiply(H , R);
+            Q = multiply(Q , H.transpose());
+        }
+
+        return make_pair(Q, R);
+    }
+
+    static vector<double> eigenvalues(Matrix A, int maxIterations = 1000, double tolerance = 1e-10) 
+    {
+        int n = A.getRows();
+        
+        if (n != A.getCols()) {
+            throw invalid_argument("Matrix must be square.");
+        }
+
+        Matrix Ak = A;
+        Matrix Q = identity(n), R = identity(n);
+
+        for (int i = 0; i < maxIterations; ++i) {
+            tie(Q, R) = qrDecomposition(Ak);
+            Ak = multiply(R, Q);
+
+            // Check convergence
+            bool converged = true;
+            for (int j = 0; j < n - 1; ++j) {
+                if (abs(Ak[j + 1][j]) > tolerance) {
+                    converged = false;
+                    break;
+                }
+            }
+            if (converged) break;
+        }
+
+        vector<double> eigenvalues(n);
+        for (int i = 0; i < n; ++i) 
+        {
+            eigenvalues[i] = Ak[i][i];
+        }
+
+        return eigenvalues;
+    }
+
+
+    static Matrix qrAlgorithm(Matrix A, int maxIterations = 1000, double tolerance = 1e-10) 
+    {
+        int n = A.getRows();
+    
+        Matrix Q_total = Matrix::identity(n);
+        Matrix Ak = A;
+        Matrix Q = identity(n), R = identity(n);
+
+        for (int i = 0; i < maxIterations; ++i) {
+            tie(Q, R) = qrDecomposition(Ak);
+            Ak = multiply(R, Q);
+            Q_total = multiply(Q_total, Q);
+
+            // Check convergence
+            bool converged = true;
+            for (int j = 0; j < n; ++j) {
+                if (abs(Ak[j][j] - Q_total[j][j]) > tolerance) {
+                    converged = false;
+                    break;
+                }
+            }
+            if (converged) break;
+        }
+
+        return Q_total;
+    }
+
+    static Matrix similarity_transform(const Matrix& A) 
+    {
+        if (A.getRows() != A.getCols()) {
+            throw invalid_argument("Matrix must be square.");
+        }
+
+        // Perform QR algorithm to get the matrix of eigenvectors
+        Matrix eigenvectorMatrix = qrAlgorithm(A);
+
+        return eigenvectorMatrix;
+    }
+
+
     void print() const {
         for (int i = 0; i < rows; ++i) {
             for (int j = 0; j < cols; ++j) {
-                cout << setw(10) << data[i][j] << " ";
+                std::cout << setw(10) << data[i][j] << " ";
             }
-            cout << endl;
+            std::cout << endl;
         }
     }
 };
 
 
 int main() {
-    vector<vector<double>> values;
+    vector<vector<double>> values  
+    = {
+        {4, 1, 0, 0},
+        {2, 6, 0, 0},
+        {0, 0, 1, 0},
+        {0, 0, 0, 7}
+    };
+
     // = {
-    //     {4, 7, 2},
-    //     {3, 6, 1},
-    //     {2, 5, 1}
+    //     {4, 7, 2, 5},
+    //     {3, 6, 1, 6},
+    //     {2, 5, 1,-5},
+    //     {7,-7, 5, 0}
     // };
 
-    int m, n;
+    // int m, n;
 
-    cout << "Enter the matrix order m, n: ";
-    cin >> m >> n;
+    // cout << "Enter the matrix order m, n: ";
+    // cin >> m >> n;
 
-    values.resize(m, vector<double>(n)); // Resize the values vector
+    // values.resize(m, vector<double>(n)); // Resize the values vector
 
-    cout << "Enter the matrix elements row by row:" << endl;
-    for (int i = 0; i < m; ++i) {
-        for (int j = 0; j < n; ++j) {
-            cin >> values[i][j]; // Use >> to read values
-        }
-    }
+    // cout << "Enter the matrix elements row by row:" << endl;
+    // for (int i = 0; i < m; ++i) {
+    //     for (int j = 0; j < n; ++j) {
+    //         cin >> values[i][j]; // Use >> to read values
+    //     }
+    // }
 
-    Matrix mat(values);
+    Matrix mat = (values);
 
-    cout << "Original Matrix:" << endl;
+    std::cout << "Original Matrix:" << endl;
     mat.print();
 
-    cout << "Transpose:" << endl;
-    Matrix transposed = mat.transpose();
-    transposed.print();
+    // cout << "Transpose:" << endl;
+    // Matrix transposed = mat.transpose();
+    // transposed.print();
 
-    if (m == n) {
-        cout << "Determinant: " << mat.determinant() << endl;
+    // if (mat.getCols() == mat.getRows()) {
+    //     cout << "Determinant: " << mat.determinant() << endl;
 
-        try 
-        {
-            cout << "Inverse:" << endl;
-            Matrix inversed =  Matrix::invertMatrix(mat);//  mat.inverse();
-            inversed.print();
+    //     try 
+    //     {
+    //         cout << "Inverse:" << endl;
+    //         Matrix inversed =  Matrix::invertMatrix(mat);//  mat.inverse();
+    //         inversed.print();
 
-            Matrix inversed1 = mat.inverse();
-            inversed1.print();
-        } 
-        catch (const runtime_error& e) {
-            cout << e.what() << endl;
-        }
-    } 
-    else 
+    //         Matrix inversed1 = mat.inverse();
+    //         inversed1.print();
+    //     } 
+    //     catch (const runtime_error& e) {
+    //         cout << e.what() << endl;
+    //     }
+    // } 
+    // else 
+    // {
+    //     cout << "Matrix is not square, so determinant and inverse cannot be computed." << endl;
+    // }
+
+    vector<double> eig = Matrix::eigenvalues(mat);
+    for(int i=0; i<eig.size(); i++)
     {
-        cout << "Matrix is not square, so determinant and inverse cannot be computed." << endl;
+        cout<<eig[i]<<", ";
     }
+
+    // Matrix similarity_matrix = Matrix::similarity_transform(mat);
+    // std::cout << "Similarity Transform (Eigenvector Matrix):" << endl;
+    // similarity_matrix.print();
+    // std::cout<<"\n######################\n";
+    // std::cout<<"diagonal form: "<<endl;
+    // (Matrix::multiply(similarity_matrix.inverse(),Matrix::multiply(mat,similarity_matrix))).print();
 
     return 0;
 }
