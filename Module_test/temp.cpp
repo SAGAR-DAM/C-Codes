@@ -3,7 +3,9 @@
 #include<limits>
 #include<vector>
 #include<algorithm>
-#include "D:\C++ codes\My_C++_modules\np.hpp"
+#include<lapack.h>
+// #include "D:\C++ codes\My_C++_modules\np.hpp"
+
 
 using namespace std;
 
@@ -11,15 +13,15 @@ int main()
 {
 
     // Example usage
-    complex a(1.0, 2.0);
-    complex b(3.0, 4.0);
+    // complex a(4.0646, -2.540);
+    // complex b(-3.4660, 4.40);
 
     // std::cout << "complex a: " << a << std::endl;
     // std::cout << "complex b: " << b << std::endl;
 
     // Exponentiation
-    complex c = a ^ b;
-    std::cout << "a ^ b = " <<c;
+    // complex c = a ^ b;
+    // std::cout << "a ^ b = " <<c;
 
     // complex c = complex(2,-5);
     // complex c1 = complex::acsccomplex(c);
@@ -34,11 +36,11 @@ int main()
     // string y = "dkajdkajd";
     // cout<<endl<<y.length()<<endl;  
 
-    vector<double> array;
-    for (int i=1; i<=100; i++)
-    {
-        array.push_back(i);
-    }
+    // vector<double> array;
+    // for (int i=1; i<=100; i++)
+    // {
+    //     array.push_back(i);
+    // }
     // for(int i=0; i<array.size(); i++)
     // {
     //     cout<<array[i]<<" ";

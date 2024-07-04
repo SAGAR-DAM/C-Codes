@@ -12,6 +12,10 @@
 
 using namespace std;
 
+// OPERATOR DECLARATION
+
+
+
 // FUNCTION DECLARATION:
 int find_index(const std::vector<double>& array, double value);
 int find_closest_index(const std::vector<double>& array, double value);

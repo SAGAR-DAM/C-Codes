@@ -4,6 +4,7 @@
 #include<vector>
 #include<algorithm>
 #include "D:\C++ codes\My_C++_modules\np.hpp"
+#include<cmath>
 
 using namespace std;
 

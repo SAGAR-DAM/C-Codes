@@ -1,88 +1,83 @@
 #include <iostream>
+#include <vector>
 #include <cmath>
+#include <tuple>
 
-class Complex {
-private:
-    double real;
-    double imag;
+// Function to perform the Gram-Schmidt process
+std::tuple<std::vector<std::vector<double>>, std::vector<std::vector<double>>> gramSchmidt(const std::vector<std::vector<double>>& A) {
+    int n = A.size();
+    std::vector<std::vector<double>> Q(n, std::vector<double>(n, 0));
+    std::vector<std::vector<double>> R(n, std::vector<double>(n, 0));
 
-public:
-    // Constructors
-    Complex(double real = 0.0, double imag = 0.0) : real(real), imag(imag) {}
-
-    // Accessors
-    double getReal() const { return real; }
-    double getImag() const { return imag; }
-
-    // Addition
-    Complex operator+(const Complex& other) const {
-        return Complex(real + other.real, imag + other.imag);
-    }
-
-    // Subtraction
-    Complex operator-(const Complex& other) const {
-        return Complex(real - other.real, imag - other.imag);
-    }
-
-    // Multiplication
-    Complex operator*(const Complex& other) const {
-        double real_mult = real * other.real - imag * other.imag;
-        double imag_mult = real * other.imag + imag * other.real;
-        return Complex(real_mult, imag_mult);
-    }
-
-    // Division
-    Complex operator/(const Complex& other) const {
-        double divisor = other.real * other.real + other.imag * other.imag;
-        if (divisor == 0.0) {
-            throw std::invalid_argument("Division by zero");
+    for (int j = 0; j < n; ++j) {
+        std::vector<double> v = A[j];
+        for (int i = 0; i < j; ++i) {
+            R[i][j] = 0;
+            for (int k = 0; k < n; ++k) {
+                R[i][j] += Q[k][i] * A[k][j];
+            }
+            for (int k = 0; k < n; ++k) {
+                v[k] -= R[i][j] * Q[k][i];
+            }
         }
-        double real_div = (real * other.real + imag * other.imag) / divisor;
-        double imag_div = (imag * other.real - real * other.imag) / divisor;
-        return Complex(real_div, imag_div);
-    }
-
-    // Exponentiation (using complex pow function)
-    Complex operator^(const Complex& exponent) const {
-        // Convert to polar form
-        double r1 = std::sqrt(real * real + imag * imag);
-        double theta1 = std::atan2(imag, real);
-        double r2 = std::sqrt(exponent.real * exponent.real + exponent.imag * exponent.imag);
-        double theta2 = std::atan2(exponent.imag, exponent.real);
-
-        // Calculate polar power
-        double r_pow = std::pow(r1, r2) * std::exp(-r2 * theta1 * std::sin(theta2));
-        double theta_pow = r2 * std::sin(theta2) * std::log(r1) + r2 * std::cos(theta2) * theta1;
-
-        // Convert back to rectangular form
-        double real_pow = r_pow * std::cos(theta_pow);
-        double imag_pow = r_pow * std::sin(theta_pow);
-        return Complex(real_pow, imag_pow);
-    }
-
-    // Output operator
-    friend std::ostream& operator<<(std::ostream& os, const Complex& complex) {
-        os << complex.real;
-        if (complex.imag >= 0) {
-            os << " + " << complex.imag << "i";
-        } else {
-            os << " - " << -complex.imag << "i";
+        R[j][j] = 0;
+        for (int k = 0; k < n; ++k) {
+            R[j][j] += v[k] * v[k];
         }
-        return os;
+        R[j][j] = std::sqrt(R[j][j]);
+        for (int k = 0; k < n; ++k) {
+            Q[k][j] = v[k] / R[j][j];
+        }
     }
-};
+
+    return std::make_tuple(Q, R);
+}
+
+// Function to multiply two matrices
+std::vector<std::vector<double>> matMul(const std::vector<std::vector<double>>& A, const std::vector<std::vector<double>>& B) {
+    int n = A.size();
+    std::vector<std::vector<double>> C(n, std::vector<double>(n, 0));
+    for (int i = 0; i < n; ++i) {
+        for (int j = 0; j < n; ++j) {
+            for (int k = 0; k < n; ++k) {
+                C[i][j] += A[i][k] * B[k][j];
+            }
+        }
+    }
+    return C;
+}
+
+// QR Algorithm to find all eigenvalues
+std::vector<double> qrAlgorithm(std::vector<std::vector<double>> A, int maxIterations = 1000, double tolerance = 1e-10) {
+    int n = A.size();
+    for (int iter = 0; iter < maxIterations; ++iter) {
+        auto [Q, R] = gramSchmidt(A);
+        A = matMul(R, Q);
+    }
+
+    std::vector<double> eigenvalues(n);
+    for (int i = 0; i < n; ++i) {
+        eigenvalues[i] = A[i][i];
+    }
+
+    return eigenvalues;
+}
 
 int main() {
     // Example usage
-    Complex a(1.0, 2.0);
-    Complex b(3.0, 4.0);
+    std::vector<std::vector<double>> matrix = {
+        {4, 1, 2},
+        {1, 3, 0},
+        {2, 0, 1}
+    };
 
-    std::cout << "Complex a: " << a << std::endl;
-    std::cout << "Complex b: " << b << std::endl;
+    std::vector<double> eigenvalues = qrAlgorithm(matrix);
 
-    // Exponentiation
-    Complex c = a ^ b;
-    std::cout << "a ^ b = " << c << std::endl;
+    std::cout << "Eigenvalues: ";
+    for (double eigenvalue : eigenvalues) {
+        std::cout << eigenvalue << " ";
+    }
+    std::cout << std::endl;
 
     return 0;
 }
