@@ -3,6 +3,7 @@
 #include <iomanip>
 #include <stdexcept>
 #include <cmath>
+#include "D:\C++ codes\My_C++_modules\np.hpp"
 
 using namespace std;
 
@@ -363,13 +364,18 @@ public:
 
 
 int main() {
-    vector<vector<double>> values  
+    vector<vector<double>> values 
     = {
-        {4, 1, 0, 0},
-        {2, 6, 0, 0},
-        {0, 0, 1, 0},
-        {0, 0, 0, 7}
+        {3,-2},
+        {4,-1}
     };
+
+    // = {
+    //     {4, 1, 0, 0},
+    //     {2, 6, 0, 0},
+    //     {0, 0, 1, 0},
+    //     {0, 0, 0, 7}
+    // };
 
     // = {
     //     {4, 7, 2, 5},

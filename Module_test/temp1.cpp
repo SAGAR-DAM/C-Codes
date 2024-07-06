@@ -1,108 +1,41 @@
-#include <iostream>
-#include <vector>
-#include <iomanip> // For std::setw
-#include <cmath>
+#include<iostream>
+#include<string>
+#include<limits>
+#include"D:\C++ codes\My_C++_modules\np.hpp"
 
 using namespace std;
 
-// Function to perform the Gaussian Elimination
-bool gaussianElimination(vector<vector<double>>& matrix, vector<vector<double>>& inverse) {
-    int n = matrix.size();
+int main()
+{
+    vector<vector<double>> values 
+    = {
+        {3,-2},
+        {4,-1}
+    };
 
-    // Augment the matrix with the identity matrix
-    for (int i = 0; i < n; ++i) {
-        inverse[i][i] = 1;
-    }
+    // = {
+    //     {4, 1, 0, 0},
+    //     {2, 6, 0, 0},
+    //     {0, 0, 1, 0},
+    //     {0, 0, 0, 7}
+    // };
 
-    for (int i = 0; i < n; ++i) {
-        // Search for maximum in this column
-        double maxEl = abs(matrix[i][i]);
-        int maxRow = i;
-        for (int k = i + 1; k < n; ++k) {
-            if (abs(matrix[k][i]) > maxEl) {
-                maxEl = abs(matrix[k][i]);
-                maxRow = k;
-            }
-        }
+    // = {
+    //     {4, 7, 2, 5},
+    //     {3, 6, 1, 6},
+    //     {2, 5, 1,-5},
+    //     {7,-7, 5, 0}
+    // };
 
-        // Swap maximum row with current row (column by column)
-        for (int k = 0; k < n; ++k) {
-            swap(matrix[maxRow][k], matrix[i][k]);
-            swap(inverse[maxRow][k], inverse[i][k]);
-        }
+    Matrix mat = values;
+    cout<<mat;
+    double a = 5;
+    Matrix M = a*mat;
+    cout<<M;
 
-        // Make sure the matrix is not singular
-        if (matrix[i][i] == 0) {
-            return false; // Singular matrix
-        }
+    // M = mat*mat;
+    // cout<<M;
 
-        // Make all rows below this one 0 in current column
-        for (int k = i + 1; k < n; ++k) {
-            double c = -matrix[k][i] / matrix[i][i];
-            for (int j = 0; j < n; ++j) {
-                if (i == j) {
-                    matrix[k][j] = 0;
-                } else {
-                    matrix[k][j] += c * matrix[i][j];
-                }
-                inverse[k][j] += c * inverse[i][j];
-            }
-        }
-    }
-
-    // Solve equation Ax = b for an upper triangular matrix A
-    for (int i = n - 1; i >= 0; --i) {
-        for (int j = 0; j < n; ++j) {
-            inverse[i][j] /= matrix[i][i];
-        }
-        for (int k = i - 1; k >= 0; --k) {
-            double c = -matrix[k][i];
-            for (int j = 0; j < n; ++j) {
-                if (i != j) {
-                    matrix[k][j] += c * matrix[i][j];
-                }
-                inverse[k][j] += c * inverse[i][j];
-            }
-        }
-    }
-    return true;
-}
-
-// Function to print a matrix
-void printMatrix(const vector<vector<double>>& matrix) {
-    int n = matrix.size();
-    for (int i = 0; i < n; ++i) {
-        for (int j = 0; j < n; ++j) {
-            cout << setw(10) << matrix[i][j] << " ";
-        }
-        cout << endl;
-    }
-}
-
-int main() {
-    int n;
-    cout << "Enter the size of the matrix (n x n): ";
-    cin >> n;
-
-    vector<vector<double>> matrix(n, vector<double>(n));
-    vector<vector<double>> inverse(n, vector<double>(n, 0));
-
-    cout << "Enter the elements of the matrix row by row:" << endl;
-    for (int i = 0; i < n; ++i) {
-        for (int j = 0; j < n; ++j) {
-            cin >> matrix[i][j];
-        }
-    }
-
-    cout << "Original Matrix:" << endl;
-    printMatrix(matrix);
-
-    if (gaussianElimination(matrix, inverse)) {
-        cout << "Inverse Matrix:" << endl;
-        printMatrix(inverse);
-    } else {
-        cout << "Matrix is singular and cannot be inverted." << endl;
-    }
-
-    return 0;
+    std::cin.get();
+    return(0);
 }

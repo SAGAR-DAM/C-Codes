@@ -85,4 +85,49 @@ complex operator^(complex& c1, complex& c2);
 std::ostream& operator<<(std::ostream& os, complex& c);
 
 
+
+
+
+class Matrix 
+{
+    private:
+        vector<vector<double>> data;
+        int rows, cols;
+
+    public:
+        Matrix(int rows, int cols);
+        Matrix(vector<vector<double>>& values);
+
+        int getRows();
+        int getCols();
+
+        vector<double>& operator[](int i);
+        //vector<double>& operator[](int i);
+        void print();
+
+        Matrix transpose();
+        double determinant();
+        Matrix inverse();
+
+        static Matrix add(Matrix a, Matrix b);
+        static Matrix subtract(Matrix A, Matrix B);
+        static Matrix multiply(Matrix a, Matrix b);
+        static Matrix identity(int size);
+        static bool isDiagonal(Matrix mat);
+        static Matrix invertMatrix(Matrix A);
+        static pair<Matrix, Matrix> qrDecomposition(Matrix A);
+        static vector<double> eigenvalues(Matrix A, int maxIterations, double tolerance);
+        static Matrix qrAlgorithm(Matrix A, int maxIterations, double tolerance);
+        static Matrix similarity_transform(Matrix A);
+
+};
+
+Matrix operator+(Matrix& M1, Matrix& M2);
+Matrix operator-(Matrix& M1, Matrix& M2);
+Matrix operator*(Matrix& M1, Matrix& M2);
+Matrix operator*(double a, Matrix& M);
+Matrix operator/(Matrix& M1, Matrix& M2);
+Matrix operator^(Matrix& M, int n);
+std::ostream& operator<<(std::ostream& os,Matrix& M);
+
 #endif // np.h
