@@ -30,7 +30,7 @@ int main()
     Matrix mat = values;
     cout<<mat;
     double a = 5;
-    Matrix M = a*mat;
+    Matrix M = mat+a;
     cout<<M;
 
     // M = mat*mat;

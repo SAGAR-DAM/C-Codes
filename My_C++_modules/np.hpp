@@ -123,10 +123,13 @@ class Matrix
 };
 
 Matrix operator+(Matrix& M1, Matrix& M2);
+Matrix operator+(Matrix& M,double  a);
 Matrix operator-(Matrix& M1, Matrix& M2);
+Matrix operator-(Matrix& M,double  a);
 Matrix operator*(Matrix& M1, Matrix& M2);
 Matrix operator*(double a, Matrix& M);
 Matrix operator/(Matrix& M1, Matrix& M2);
+Matrix operator/(double a, Matrix& M);
 Matrix operator^(Matrix& M, int n);
 std::ostream& operator<<(std::ostream& os,Matrix& M);
 

@@ -799,9 +799,41 @@ Matrix operator+(Matrix& M1, Matrix& M2)
     return Matrix::add(M1,M2);
 }
 
+Matrix operator+(Matrix& M1, double  a) 
+{   
+    vector<vector<double>> temp;
+    temp.resize(M1.getRows(), vector<double>(M1.getCols())); // Resize the values vector
+
+    for(int i=0; i<M1.getRows(); i++)
+    {
+        for(int j=0; j<M1.getCols(); j++)
+        {
+            temp[i][j] = M1[i][j]+a;
+        }
+    }
+    Matrix M = temp;
+    return M;
+}
+
 Matrix operator-(Matrix& M1, Matrix& M2) 
 {
     return Matrix::subtract(M1,M2);
+}
+
+Matrix operator-(Matrix& M1, double  a) 
+{   
+    vector<vector<double>> temp;
+    temp.resize(M1.getRows(), vector<double>(M1.getCols())); // Resize the values vector
+
+    for(int i=0; i<M1.getRows(); i++)
+    {
+        for(int j=0; j<M1.getCols(); j++)
+        {
+            temp[i][j] = M1[i][j]-a;
+        }
+    }
+    Matrix M = temp;
+    return M;
 }
 
 Matrix operator*(Matrix& M1, Matrix& M2) 
@@ -828,6 +860,22 @@ Matrix operator*(double  a, Matrix& M1)
 Matrix operator/(Matrix& M1, Matrix& M2) 
 {   
     return Matrix::multiply(M1,M2.inverse());
+}
+
+Matrix operator/(double  a, Matrix& M1) 
+{   
+    vector<vector<double>> temp;
+    temp.resize(M1.getRows(), vector<double>(M1.getCols())); // Resize the values vector
+
+    for(int i=0; i<M1.getRows(); i++)
+    {
+        for(int j=0; j<M1.getCols(); j++)
+        {
+            temp[i][j] = M1[i][j]/a;
+        }
+    }
+    Matrix M = temp;
+    return M;
 }
 
 Matrix operator^(Matrix& M1, int n) 
