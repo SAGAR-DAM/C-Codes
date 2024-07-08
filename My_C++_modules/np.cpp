@@ -19,6 +19,24 @@ using namespace std;
 /*-------------------------------------------------------------------------- */
 
 
+// ###########################################################################
+//          Function to find the factorial of a number
+// ###########################################################################
+double factorial(int n)
+{
+    if(n==1)
+    {
+        double a = 1;
+        return a;
+    }
+
+    else
+    {
+        double val =  n*factorial(n-1);
+        return val;
+    }
+}
+
 
 // ###########################################################################
 //          Function to find the index of a value in a vector
@@ -133,71 +151,81 @@ double stdarr(const std::vector<double>& vec) {
 
 // costructor of the class: 
 //----------------------------
-complex::complex(double r, double i) : real(r), imag(i) {}
+Complex::Complex(double r, double i) : real(r), imag(i) {}
 
 
 // Functions over the class:
 //-----------------------------
-double complex::getreal()
+double Complex::getreal()
 {
     return real;
 }
 
-double complex::getimag()
+double Complex::getimag()
 {
     return imag;
 }
 
-double complex::get_r()
+double Complex::get_r()
 {
     return r;
 }
 
-float complex::get_theta()
+float Complex::get_theta()
 {
     return theta;
 }
 
-void complex::getcomplex()
+void Complex::getcomplex()
 {
     if (imag >= 0)
     {
-        cout << "The complex number is: " << real << " + " << imag << "j" << endl;
+        cout << "The Complex number is: " << real << " + " << imag << "j" << endl;
     }
     else
     {
-        cout << "The complex number is: " << real << " " << imag << "j" << endl;
+        cout << "The Complex number is: " << real << " " << imag << "j" << endl;
     }
 }
 
-void complex::getcomplex_polar()
+void Complex::getcomplex_polar()
 {
     //rect_to_polar();
-    cout << "The complex number in polar form: " << r << " exp(" << theta << "j)" << endl;
+    cout << "The Complex number in polar form: " << r << " exp(" << theta << "j)" << endl;
 }
 
-double complex::abscomplex(complex c)
+double Complex::abscomplex(Complex c)
 {
     return pow((c.getreal()*c.getreal()+c.getimag()*c.getimag()),0.5);
 }
 
-float complex::argcomplex(complex c)
+float Complex::argcomplex(Complex c)
 {   
     //c.rect_to_polar();
     return c.theta; 
 }
 
-complex complex::addcomplex(complex c1, complex c2)
+Complex Complex::bar()
 {
-    return complex(c1.real + c2.real, c1.imag + c2.imag);
+    return Complex(real,-imag);
 }
 
-complex complex::subtractcomplex(complex c1, complex c2)
+Complex Complex::conjugate(Complex c)
 {
-    return complex(c1.real - c2.real, c1.imag - c2.imag);
+    return Complex(c.real,-c.imag);
 }
 
-complex complex::multcomplex(complex c1, complex c2)
+Complex Complex::addcomplex(Complex c1, Complex c2)
+{
+    return Complex(c1.real + c2.real, c1.imag + c2.imag);
+}
+
+Complex Complex::subtractcomplex(Complex c1, Complex c2)
+{
+    return Complex(c1.real - c2.real, c1.imag - c2.imag);
+}
+
+Complex Complex::multcomplex(Complex c1, Complex c2)
 {
     //c1.rect_to_polar();
     //c2.rect_to_polar();
@@ -216,10 +244,10 @@ complex complex::multcomplex(complex c1, complex c2)
     double real_mult = r_mult * cos(theta_mult);
     double imag_mult = r_mult * sin(theta_mult);
 
-    return complex(real_mult, imag_mult);
+    return Complex(real_mult, imag_mult);
 }
 
-complex complex::divcomplex(complex c1, complex c2)
+Complex Complex::divcomplex(Complex c1, Complex c2)
 {
     //c1.rect_to_polar();
     //c2.rect_to_polar();
@@ -238,10 +266,10 @@ complex complex::divcomplex(complex c1, complex c2)
     double real_div = r_div * cos(theta_div);
     double imag_div = r_div * sin(theta_div);
 
-    return complex(real_div, imag_div);
+    return Complex(real_div, imag_div);
 }
 
-complex complex::complex_exponenciation(complex c, float n)
+Complex Complex::complex_exponenciation(Complex c, float n)
 {
     //c.rect_to_polar();
     double r_exp = pow(c.r, n);
@@ -249,10 +277,10 @@ complex complex::complex_exponenciation(complex c, float n)
 
     double real_exp = r_exp * cos(theta_exp);
     double imag_exp = r_exp * sin(theta_exp);
-    return complex(real_exp, imag_exp);
+    return Complex(real_exp, imag_exp);
 }
 
-complex complex::complexpow(complex c1, complex c2)
+Complex Complex::complexpow(Complex c1, Complex c2)
 {
     //c1.rect_to_polar();
     //c2.rect_to_polar();
@@ -264,143 +292,143 @@ complex complex::complexpow(complex c1, complex c2)
 
     double real_pow = r_pow * cos(theta_pow);
     double imag_pow = r_pow * sin(theta_pow);
-    return complex(real_pow, imag_pow);
+    return Complex(real_pow, imag_pow);
 }
 
-complex complex::real_pow_complex(complex c, float n)
+Complex Complex::real_pow_complex(Complex c, float n)
 {
-    complex c1 = complexpow(complex(n,0),c);
+    Complex c1 = complexpow(Complex(n,0),c);
     return c1;
 }
 
-complex complex::sincomplex(complex c)
+Complex Complex::sincomplex(Complex c)
 {
     double real_sin = sin(c.real)*cosh(c.imag), imag_sin = cos(c.real)*sinh(c.imag);
-    complex c_sin = complex(real_sin, imag_sin);
+    Complex c_sin = Complex(real_sin, imag_sin);
     //c_sin.rect_to_polar();
     return c_sin;
 }
 
-complex complex::coscomplex(complex c)
+Complex Complex::coscomplex(Complex c)
 {
     double real_cos = cos(c.real)*cosh(c.imag), imag_cos = -sin(c.real)*sinh(c.imag);
-    complex c_cos = complex(real_cos, imag_cos);
+    Complex c_cos = Complex(real_cos, imag_cos);
     //c_cos.rect_to_polar();
     return c_cos;
 }
 
-complex complex::tancomplex(complex c)
+Complex Complex::tancomplex(Complex c)
 {
-    complex c_tan = divcomplex(sincomplex(c),coscomplex(c));
+    Complex c_tan = divcomplex(sincomplex(c),coscomplex(c));
     return c_tan;
 }
 
-complex complex::csccomplex(complex c)
+Complex Complex::csccomplex(Complex c)
 {
-    complex c_csc = divcomplex(complex(1,0),sincomplex(c));
+    Complex c_csc = divcomplex(Complex(1,0),sincomplex(c));
     return c_csc;
 }
 
-complex complex::seccomplex(complex c)
+Complex Complex::seccomplex(Complex c)
 {
-    complex c_sec = divcomplex(complex(1,0),coscomplex(c));
+    Complex c_sec = divcomplex(Complex(1,0),coscomplex(c));
     return c_sec;
 }
 
-complex complex::cotcomplex(complex c)
+Complex Complex::cotcomplex(Complex c)
 {
-    complex c_cot = divcomplex(coscomplex(c),sincomplex(c));
+    Complex c_cot = divcomplex(coscomplex(c),sincomplex(c));
     return c_cot;
 }
 
-complex complex::logcomplex(complex c)
+Complex Complex::logcomplex(Complex c)
 {
     //c.rect_to_polar();
     double real_log = log(c.r), imag_log = c.theta;
-    complex c_log = complex(real_log,imag_log);
+    Complex c_log = Complex(real_log,imag_log);
     return c_log;
 }
 
-complex complex::asincomplex(complex c)
+Complex Complex::asincomplex(Complex c)
 {
-    complex iota = complex(0,1);
-    complex z = addcomplex(multcomplex(iota,c),complex_exponenciation(subtractcomplex(complex(1,0),multcomplex(c,c)),0.5));
+    Complex iota = Complex(0,1);
+    Complex z = addcomplex(multcomplex(iota,c),complex_exponenciation(subtractcomplex(Complex(1,0),multcomplex(c,c)),0.5));
     z = logcomplex(z);
     z = divcomplex(z,iota);
     return z;
 }
 
-complex complex::acoscomplex(complex c)
+Complex Complex::acoscomplex(Complex c)
 {
-    complex iota = complex(0,1);
-    complex z = addcomplex(c,complex_exponenciation(subtractcomplex(multcomplex(c,c),complex(1,0)),0.5));
+    Complex iota = Complex(0,1);
+    Complex z = addcomplex(c,complex_exponenciation(subtractcomplex(multcomplex(c,c),Complex(1,0)),0.5));
     z = logcomplex(z);
     z = divcomplex(z,iota);
     return z;
 }
 
-complex complex::atancomplex(complex c)
+Complex Complex::atancomplex(Complex c)
 {
-    complex iota = complex(0,1);
-    complex z = divcomplex(subtractcomplex(iota,c),addcomplex(iota,c));
+    Complex iota = Complex(0,1);
+    Complex z = divcomplex(subtractcomplex(iota,c),addcomplex(iota,c));
     z = logcomplex(z);
-    z = divcomplex(z,complex(0,2));
+    z = divcomplex(z,Complex(0,2));
     return z;
 }
 
-complex complex::acsccomplex(complex c)
+Complex Complex::acsccomplex(Complex c)
 {
-    complex z = asincomplex(divcomplex(complex(1,0),c));
+    Complex z = asincomplex(divcomplex(Complex(1,0),c));
     return z;
 }
 
-complex complex::aseccomplex(complex c)
+Complex Complex::aseccomplex(Complex c)
 {
-    complex z = acoscomplex(divcomplex(complex(1,0),c));
+    Complex z = acoscomplex(divcomplex(Complex(1,0),c));
     return z;
 }
 
-complex complex::acotcomplex(complex c)
+Complex Complex::acotcomplex(Complex c)
 {
-    complex z = atancomplex(divcomplex(complex(1,0),c));
+    Complex z = atancomplex(divcomplex(Complex(1,0),c));
     return z;
 }
 
 
 // Addition operator definition outside the class
-complex operator+(complex& c1, complex& c2) 
+Complex operator+(Complex c1, Complex c2) 
 {
-    return complex::addcomplex(c1,c2);
+    return Complex::addcomplex(c1,c2);
 }
 
 
-// Operators of the complex class:
+// Operators of the Complex class:
 //----------------------------------
-complex operator-(complex& c1, complex& c2) 
+Complex operator-(Complex c1, Complex c2) 
 {
-    return complex::subtractcomplex(c1,c2);
+    return Complex::subtractcomplex(c1,c2);
 }
 
 // Multiplication operator definition outside the class
-complex operator*(complex& c1, complex& c2) 
+Complex operator*(Complex c1, Complex c2) 
 {
-    return complex::multcomplex(c1,c2);
+    return Complex::multcomplex(c1,c2);
 }
 
 // Division operator definition outside the class
-complex operator/(complex& c1, complex& c2) 
+Complex operator/(Complex c1, Complex c2) 
 {
-    return complex::divcomplex(c1,c2);
+    return Complex::divcomplex(c1,c2);
 }
 
 // Exponentiation operator definition outside the class
-complex operator^(complex& c1, complex& c2) 
+Complex operator^(Complex c1, Complex c2) 
 {
-    return complex::complexpow(c1,c2);
+    return Complex::complexpow(c1,c2);
 }
 
 // Output operator
-std::ostream& operator<<(std::ostream& os, complex& c) {
+std::ostream& operator<<(std::ostream& os, Complex& c) {
     os << c.getreal();
     if (c.getimag() >= 0) {
         os << " + " << c.getimag() << "j";
@@ -414,7 +442,7 @@ std::ostream& operator<<(std::ostream& os, complex& c) {
 
 
 // ###########################################################################
-//                              COMPLEX CLASS
+//                              MATRIX CLASS
 // ###########################################################################
 
 Matrix::Matrix(int rows, int cols) : rows(rows), cols(cols) 
@@ -576,6 +604,20 @@ Matrix Matrix::identity(int size)
         id[i][i] = 1.0;
     }
     return id;
+}
+
+double Matrix::trace(Matrix M)
+{
+    if (M.rows != M.cols) 
+    {
+        throw invalid_argument("Matrix must be square !!");
+    }
+    double x = 0.0;
+    for(int i=0; i<M.rows; i++)
+    {
+        x = x+M[i][i];
+    }
+    return x;
 }
 
 bool Matrix::isDiagonal(Matrix mat) 
@@ -781,6 +823,81 @@ Matrix Matrix::similarity_transform(Matrix A)
     return eigenvectorMatrix;
 }
 
+Matrix Matrix::exp_matrix(Matrix M)
+{
+    Matrix M1 = Matrix::identity(M.getRows());
+    for(int i=1;i<=100;i++)
+    {
+        M1 = M1 + 1/(factorial(i))*(M^i);
+    }
+    return M1;
+}
+
+Matrix Matrix::cos_matrix(Matrix M)
+{
+    Matrix M1 = Matrix::identity(M.getRows());
+    for(int i=1; i<=100; i++)
+    {
+        M1 = M1 + pow(-1,i)/factorial(2*i)*(M^(2*i));
+    }
+    return M1;
+}
+
+Matrix Matrix::sin_matrix(Matrix M)
+{
+    Matrix M1 = M;
+    for(int i=1; i<=100; i++)
+    {
+        M1 = M1 + pow(-1,i)/factorial(2*i+1)*(M^(2*i+1));
+    }
+    return M1;
+}
+
+Matrix Matrix::special_matrix(Matrix M, int k)
+{
+    Matrix A = Matrix::identity(k);
+    for(int i=0; i<k; i++)
+    {
+        for(int j=0; j<k; j++)
+        {
+            if(j<=i)
+            {
+                A[i][j]=Matrix::trace(M^(i-j+1));
+            }
+            if(j==i+1)
+            {
+                A[i][j]=k-j;
+            }
+        }
+    }
+    return A;
+}
+
+vector<double> Matrix::coeff_charac(Matrix M)
+{
+    if (M.getRows() != M.getCols()) 
+    {
+        throw invalid_argument("Matrix must be square !!");
+    }
+    int n = M.getRows();
+    vector<double> coeff;
+    for(int i = 0; i<=n; i++)
+    {
+        if(i==0)
+        {
+            coeff.push_back(1);
+        }
+        else
+        {
+            Matrix A = Matrix::special_matrix(M,i);
+            double val = pow(-1,i)*A.determinant()/factorial(i);
+            coeff.push_back(val);
+        }
+    }
+    //std::reverse(coeff.begin(), coeff.end());
+    return coeff;
+}
+
 void Matrix::print()
 {
     for (int i = 0; i < rows; ++i) {
@@ -792,14 +909,14 @@ void Matrix::print()
 }
 
 
-// Operators of the complex class:
+// Operators of the Matrixs class:
 //----------------------------------
-Matrix operator+(Matrix& M1, Matrix& M2) 
+Matrix operator+(Matrix M1, Matrix M2) 
 {
     return Matrix::add(M1,M2);
 }
 
-Matrix operator+(Matrix& M1, double  a) 
+Matrix operator+(Matrix M1, double  a) 
 {   
     vector<vector<double>> temp;
     temp.resize(M1.getRows(), vector<double>(M1.getCols())); // Resize the values vector
@@ -815,12 +932,12 @@ Matrix operator+(Matrix& M1, double  a)
     return M;
 }
 
-Matrix operator-(Matrix& M1, Matrix& M2) 
+Matrix operator-(Matrix M1, Matrix M2) 
 {
     return Matrix::subtract(M1,M2);
 }
 
-Matrix operator-(Matrix& M1, double  a) 
+Matrix operator-(Matrix M1, double  a) 
 {   
     vector<vector<double>> temp;
     temp.resize(M1.getRows(), vector<double>(M1.getCols())); // Resize the values vector
@@ -836,12 +953,12 @@ Matrix operator-(Matrix& M1, double  a)
     return M;
 }
 
-Matrix operator*(Matrix& M1, Matrix& M2) 
+Matrix operator*(Matrix M1, Matrix M2) 
 {
     return Matrix::multiply(M1,M2);
 }
 
-Matrix operator*(double  a, Matrix& M1) 
+Matrix operator*(double  a, Matrix M1) 
 {   
     vector<vector<double>> temp;
     temp.resize(M1.getRows(), vector<double>(M1.getCols())); // Resize the values vector
@@ -857,12 +974,12 @@ Matrix operator*(double  a, Matrix& M1)
     return M;
 }
 
-Matrix operator/(Matrix& M1, Matrix& M2) 
+Matrix operator/(Matrix M1, Matrix M2) 
 {   
     return Matrix::multiply(M1,M2.inverse());
 }
 
-Matrix operator/(double  a, Matrix& M1) 
+Matrix operator/(double  a, Matrix M1) 
 {   
     vector<vector<double>> temp;
     temp.resize(M1.getRows(), vector<double>(M1.getCols())); // Resize the values vector
@@ -878,11 +995,19 @@ Matrix operator/(double  a, Matrix& M1)
     return M;
 }
 
-Matrix operator^(Matrix& M1, int n) 
+Matrix operator^(Matrix M1, int n) 
 {   
     if(M1.getRows() != M1.getCols())
     {
         throw invalid_argument("Matrix must be square.");
+    }
+    if(n==0)
+    {
+        return Matrix::identity(M1.getRows());
+    }
+    if(n==1)
+    {
+        return M1;
     }
 
     Matrix M = Matrix::identity(M1.getRows());

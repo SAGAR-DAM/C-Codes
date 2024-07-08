@@ -1,10 +1,10 @@
 #include <iostream>
-#include "D:\C++ codes\My_C++_modules\complex.hpp"
+#include "D:\C++ codes\My_C++_modules\np.hpp"
 using namespace std;
 
 int main()
 {
-    // get a complex (simplest program):
+    // get a Complex (simplest program):
     //________________________________________
     // double a,b;
     // cout<<"real part: ";
@@ -13,147 +13,147 @@ int main()
     // cout<<"real part: ";
     // cin>>b;
 
-    // complex c1=complex(a,b);
+    // Complex c1=Complex(a,b);
     // c1.getcomplex();
 
-    // complex number in polar form:
-    // complex c=complex(1,1);
+    // Complex number in polar form:
+    // Complex c=Complex(1,1);
     // c.getcomplex_polar();
 
-    // complex no abs and arg:
-    // complex c = complex(1,1);
+    // Complex no abs and arg:
+    // Complex c = Complex(1,1);
     // cout<<"abs: "<<c.get_r()<<" ; arg: "<<c.get_theta();
 
-    // abs complex:
-    // complex c=complex(1,1);
-    // double absc = complex::abscomplex(c);
+    // abs Complex:
+    // Complex c=Complex(1,1);
+    // double absc = Complex::abscomplex(c);
     // cout<<absc;
 
-    // abs complex:
-    // complex c=complex(1,1);
-    // double argc = complex::argcomplex(c);
+    // abs Complex:
+    // Complex c=Complex(1,1);
+    // double argc = Complex::argcomplex(c);
     // cout<<argc;
 
-    // add two complex number:
+    // add two Complex number:
     //________________________________________
-    // complex c1 = complex(2,4), c2 = complex(5,-1);
-    // complex c3 = complex::addcomplex(c1,c2);
+    // Complex c1 = Complex(2,4), c2 = Complex(5,-1);
+    // Complex c3 = Complex::addcomplex(c1,c2);
     // c3.getcomplex();
 
-    // subtract two complex number:
+    // subtract two Complex number:
     //________________________________________
-    // complex c1 = complex(2,4), c2 = complex(5,-1);
-    // complex c3 = complex::subtractcomplex(c1,c2);
+    // Complex c1 = Complex(2,4), c2 = Complex(5,-1);
+    // Complex c3 = Complex::subtractcomplex(c1,c2);
     // c3.getcomplex();
 
-    // multiply two complex number:
+    // multiply two Complex number:
     // ________________________________________
-    // complex c1 = complex(2,4), c2 = complex(5,-1);
-    // complex c3 = complex::multcomplex(c1,c2);
+    // Complex c1 = Complex(2,4), c2 = Complex(5,-1);
+    // Complex c3 = Complex::multcomplex(c1,c2);
     // c3.getcomplex();
     // c3.getcomplex_polar();
 
-    // division of two complex number:
+    // division of two Complex number:
     //________________________________________
-    // complex c1 = complex(2,4), c2 = complex(5,-1);
-    // complex c3 = complex::divcomplex(c1,c2);
+    // Complex c1 = Complex(2,4), c2 = Complex(5,-1);
+    // Complex c3 = Complex::divcomplex(c1,c2);
     // c3.getcomplex();
     // c3.getcomplex_polar();
 
-    // complex to the power complex number:
+    // Complex to the power Complex number:
     // ________________________________________
-    // complex c1 = complex(2,-5), c2 = complex(2.6,-1);
-    // complex c3 = complex::complexpow(c1,c2);
+    // Complex c1 = Complex(2,-5), c2 = Complex(2.6,-1);
+    // Complex c3 = Complex::complexpow(c1,c2);
     // c3.getcomplex();
     // c3.getcomplex_polar();
 
-    // real to the power complex number:
+    // real to the power Complex number:
     // ________________________________________
-    // complex c1 = complex(2,-5);
+    // Complex c1 = Complex(2,-5);
     // float n = 2;
-    // complex c3 = complex::real_pow_complex(c1,n);
+    // Complex c3 = Complex::real_pow_complex(c1,n);
     // c3.getcomplex();
     // c3.getcomplex_polar();
 
-    // sin, cos, tan, ... of complex number:
+    // sin, cos, tan, ... of Complex number:
     // ________________________________________
-    // complex c = complex(2,-5);
-    // complex c1 = complex::sincomplex(c);
+    // Complex c = Complex(2,-5);
+    // Complex c1 = Complex::sincomplex(c);
     // cout<<"sin(c): ";
     // c1.getcomplex();
     // c1.getcomplex_polar();
 
-    // c1 = complex::coscomplex(c);
+    // c1 = Complex::coscomplex(c);
     // cout<<"cos(c): ";
     // c1.getcomplex();
     // c1.getcomplex_polar();
 
-    // c1 = complex::tancomplex(c);
+    // c1 = Complex::tancomplex(c);
     // cout<<"tan(c): ";
     // c1.getcomplex();
     // c1.getcomplex_polar();
 
-    // c1 = complex::csccomplex(c);
+    // c1 = Complex::csccomplex(c);
     // cout<<"csc(c): ";
     // c1.getcomplex();
     // c1.getcomplex_polar();
 
-    // c1 = complex::seccomplex(c);
+    // c1 = Complex::seccomplex(c);
     // cout<<"sec(c): ";
     // c1.getcomplex();
     // c1.getcomplex_polar();
 
-    // c1 = complex::cotcomplex(c);
+    // c1 = Complex::cotcomplex(c);
     // cout<<"cot(c): ";
     // c1.getcomplex();
     // c1.getcomplex_polar();
 
 
-    // log of complex number:
+    // log of Complex number:
     // ________________________________________
-    // complex c = complex(1.414,1.414);
-    // complex c1 = complex::logcomplex(c);
+    // Complex c = Complex(1.414,1.414);
+    // Complex c1 = Complex::logcomplex(c);
     // cout<<"log(c): ";
     // c1.getcomplex();
     // c1.getcomplex_polar();
 
-    // asin, acos, atan, ... of complex number:
+    // asin, acos, atan, ... of Complex number:
     // ________________________________________
-    // complex c = complex(2,-5);
-    // complex c1 = complex::asincomplex(c);
+    // Complex c = Complex(2,-5);
+    // Complex c1 = Complex::asincomplex(c);
     // cout<<"asin(c): ";
     // c1.getcomplex();
     // c1.getcomplex_polar();
 
-    // complex c = complex(2,-5);
-    // complex c1 = complex::acoscomplex(c);
+    // Complex c = Complex(2,-5);
+    // Complex c1 = Complex::acoscomplex(c);
     // cout<<"acos(c): ";
     // c1.getcomplex();
     // c1.getcomplex_polar();
 
-    // complex c = complex(2,-5);
-    // complex c1 = complex::atancomplex(c);
+    // Complex c = Complex(2,-5);
+    // Complex c1 = Complex::atancomplex(c);
     // cout<<"atan(c): ";
     // c1.getcomplex();
     // c1.getcomplex_polar();
 
-    // complex c = complex(2,-5);
-    // complex c1 = complex::acsccomplex(c);
+    // Complex c = Complex(2,-5);
+    // Complex c1 = Complex::acsccomplex(c);
     // cout<<"acsc(c): ";
     // c1.getcomplex();
     // c1.getcomplex_polar();
 
-    // complex c = complex(2,-5);
-    // complex c1 = complex::aseccomplex(c);
+    // Complex c = Complex(2,-5);
+    // Complex c1 = Complex::aseccomplex(c);
     // cout<<"asec(c): ";
     // c1.getcomplex();
     // c1.getcomplex_polar();
 
-    // complex c = complex(2,-5);
-    // complex c1 = complex::acotcomplex(c);
-    // cout<<"acot(c): ";
-    // c1.getcomplex();
-    // c1.getcomplex_polar();
+    Complex c = Complex(2,-5);
+    Complex c1 = Complex::acotcomplex(c);
+    cout<<"acot(c): ";
+    c1.getcomplex();
+    c1.getcomplex_polar();
 
 
 
