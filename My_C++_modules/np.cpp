@@ -4,7 +4,7 @@
 #include<vector>
 #include<algorithm>
 #include<iomanip>
-#include <stdexcept>
+#include<stdexcept>
 #include "D:\C++ codes\My_C++_modules\np.hpp"
 #include<cmath>
 

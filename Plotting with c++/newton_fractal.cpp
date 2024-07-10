@@ -10,9 +10,9 @@
 using namespace std;
 using namespace chrono;
 
-const int ITERATION = 100;
-const int RES = 1000;
-const int rootnumber = 6;
+const int ITERATION = 50;
+const int RES = 100;
+const int rootnumber = 10;
 
 // Function to create random roots
 vector<complex<double>> create_random_root(int n) 
@@ -185,7 +185,7 @@ int main() {
     // Create Gnuplot script
     std::ofstream gnuplotScript("plot.gnuplot");
     // gnuplotScript << "set term wxt\n";  // Change to 'qt' if you prefer Qt terminal
-    gnuplotScript << "set term wxt size 1000,1000\n";  // Adjust size as needed
+    gnuplotScript << "set term wxt size 900,900\n";  // Adjust size as needed
     gnuplotScript << "set view map\n";
     gnuplotScript << "set size ratio -1\n";
 

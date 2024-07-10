@@ -1,4 +1,4 @@
-set term wxt
+set term wxt size 1000,1000
 set view map
 set size ratio -1
 set palette defined ( \
@@ -13,17 +13,17 @@ set palette defined ( \
 0.8 1 0 0, \
 0.9 0.5 0 0, \
 1 0.5 0 0 )
-set xlabel 'x'
-set ylabel 'y'
-set cblabel 'f(z)'
+set xlabel 'Re(z)'
+set ylabel 'Im(z)'
+set cblabel 'Root Index'
 set xtics font ',10'
 set ytics font ',10'
-set xlabel 'x' font ',10'
-set ylabel 'y' font ',10'
-set cblabel 'z' font ',10'
+set xlabel 'Re(z)' font ',10'
+set ylabel 'Im(z)' font ',10'
+set cblabel 'Root Index' font ',10'
 set cbtics font ',10'
-set xrange [-10:10]
-set yrange [-10:10]
-set title 'contour complex plot of f(z) = φ(ln(sin z)); z=x+jy' font ',10'
+set xrange [-1.1:1.1]
+set yrange [-1.1:1.1]
+set title 'Newton Fractal' font ',10'
 unset key
 splot 'data.txt' using 1:2:3 with image
