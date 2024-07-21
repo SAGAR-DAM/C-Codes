@@ -190,7 +190,7 @@ int main()
     Matrix mat = values;
     cout<<"trace: "<<Matrix::trace(mat)<<endl;
     cout<<"det: "<<mat.determinant()<<endl;
-    cout<<"term: "<<Matrix::trace(mat^2)<<endl;
+    
     // cout<<mat;
     // double a = 5;
     // Matrix M = a*mat;
