@@ -1,245 +1,274 @@
 #include <iostream>
-#include <complex>
 #include <vector>
+#include <complex>
 #include <random>
+#include <sstream>
 #include <fstream>
-#include <chrono>
-#include <algorithm>
-#include <limits>
+#include <cstdlib>
+#include <cstdio>
+#include "D:\C++ codes\My_C++_modules\np.hpp"
+#include <limits>  
+#include <regex>
 
 using namespace std;
-using namespace chrono;
 
-const int ITERATION = 100;
-const int RES = 1000;
-const int rootnumber = 6;
-
-// Function to create random roots
-vector<complex<double>> create_random_root(int n) 
+extern "C" 
 {
-    vector<complex<double>> root;
-    random_device rd;
-    mt19937 gen(rd());
-    uniform_real_distribution<> dis(-1.0, 1.0);
-
-    for (int i = 0; i < n; ++i) 
-    {
-        complex<double> z(dis(gen), dis(gen));
-        root.push_back(z);
-    }
-    return root;
+    // LAPACK routine to compute eigenvalues of a general matrix
+    void dgeev_(char*, char*, int*, double*, int*, double*, double*, double*, int*, double*, int*, double*, int*, int*);
 }
 
-// Function to create n-th roots of unity
-vector<complex<double>> create_circ_root(int n) 
-{
-    vector<complex<double>> roots;
-    double angle_increment = 2.0 * M_PI / n;
 
-    for (int k = 0; k < n; ++k) 
+// Function to create a companion matrix for the polynomial
+std::vector<double> createCompanionMatrix(const std::vector<double>& coefficients) 
+{
+    int n = coefficients.size() - 1;  // Degree of the polynomial
+
+    // Companion matrix will be of size n x n
+    std::vector<double> companionMatrix(n * n, 0.0);
+
+    // Fill the last column with -coefficients / a_n
+    for (int i = 0; i < n; ++i) 
     {
-        double angle = k * angle_increment;
-        complex<double> z(cos(angle), sin(angle));
-        roots.push_back(z);
+        companionMatrix[i * n + (n - 1)] = -coefficients[i] / coefficients[n];
+    }
+
+    // Fill the sub-diagonal with 1s
+    for (int i = 1; i < n; ++i) 
+    {
+        companionMatrix[i * n + (i - 1)] = 1.0;
+    }
+
+    return companionMatrix;
+}
+
+
+// Function to compute roots of a polynomial using LAPACK
+std::vector<std::complex<double>> solvePolynomial(const std::vector<double>& coefficients) 
+{
+    int degree = coefficients.size() - 1;
+    std::vector<double> companionMatrix = createCompanionMatrix(coefficients);
+
+    // Arrays for eigenvalues
+    std::vector<double> wr(degree), wi(degree);
+
+    // LAPACK parameters
+    int n = degree;  // The size of the companion matrix
+    int lda = n;
+    int info;
+    int lwork = 4 * n;
+    std::vector<double> work(4 * n);  // Work array
+
+    // Temporary arrays for left and right eigenvectors (not needed)
+    double vl[1], vr[1];
+    char jobvl = 'N';  // No left eigenvectors are computed
+    char jobvr = 'N';  // No right eigenvectors are computed
+
+    // Call LAPACK routine to compute the eigenvalues (roots)
+    dgeev_(&jobvl, &jobvr, &n, companionMatrix.data(), &lda, wr.data(), wi.data(), vl, &lda, vr, &lda, work.data(), &lwork, &info);
+
+    // Check for success
+    if (info != 0) 
+    {
+        throw std::runtime_error("Error: dgeev failed with info = " + std::to_string(info));
+    }
+
+    // Collect the roots as complex numbers
+    std::vector<std::complex<double>> roots;
+    for (int i = 0; i < degree; i++) 
+    {
+        std::complex<double> root(wr[i], wi[i]);
+        roots.push_back(root);
     }
 
     return roots;
 }
 
-// Function to compute f(z)
-complex<double> f(complex<double>& z, const vector<complex<double>>& root) {
-    complex<double> val = 1.0;
-    for (const auto& r : root) {
-        val *= (z - r);
+// Function to generate a random double vector of a given size and range
+std::vector<double> generateRandomDoubleVector(int size, double min_value, double max_value) {
+    // Initialize a random number generator
+    std::random_device rd;  // Seed for randomness
+    std::mt19937 gen(rd()); // Mersenne Twister engine seeded with random device
+
+    // Define a uniform distribution for double values in the range [min_value, max_value]
+    std::uniform_real_distribution<> distrib(min_value, max_value);
+
+    // Create a vector of random doubles
+    std::vector<double> random_vector(size);
+    for (int i = 0; i < size; ++i) {
+        random_vector[i] = distrib(gen);
     }
-    return val;
+
+    return random_vector;
 }
 
-// Function to compute df(z)
-complex<double> df(complex<double>& z, const vector<complex<double>>& root) {
-    complex<double> val = 0.0;
-    for (size_t i = 0; i < root.size(); ++i) 
-    {
-        complex<double> mult = 1.0;
-        for (size_t j = 0; j < root.size(); ++j) 
-        {
-            if (j != i) {
-                mult *= (z - root[j]);
-            }
-        }
-        val += mult;
-    }
-    return val;
-}
 
-// Function to perform a single iteration step
-complex<double> iteration_step(complex<double>& z, const vector<complex<double>>& root) 
+
+// Function to generate a random integer vector of a given size and range
+std::vector<int> generateRandomVector(int size, int min_value, int max_value) 
 {
-    if(abs(f(z,root))<=0.000001 || abs(df(z,root))<=0.000001)
-    {
-        return z;
+    // Initialize a random number generator
+    std::random_device rd;  // Seed for randomness
+    std::mt19937 gen(rd()); // Mersenne Twister engine seeded with random device
+
+    // Define a distribution in the range [min_value, max_value]
+    std::uniform_int_distribution<> distrib(min_value, max_value);
+
+    // Create a vector of random integers
+    std::vector<int> random_vector(size);
+    for (int i = 0; i < size; ++i) {
+        random_vector[i] = distrib(gen);
     }
-    return z - f(z, root) / df(z, root);
+
+    return random_vector;
 }
 
-int main() {
-    auto t_start = high_resolution_clock::now();
 
-    // Generate random roots
-    //vector<complex<double>> root = create_random_root(rootnumber);
-    vector<complex<double>> root = create_circ_root(rootnumber);
+// Function to convert a vector of integers to a vector of doubles
+std::vector<double> convertIntToDouble(const std::vector<int>& int_vector) {
+    std::vector<double> double_vector(int_vector.size());
 
-    cout << "Roots:" << endl;
-    for (size_t i = 0; i < root.size(); i++) 
-    {
-        cout << "z" << i + 1 << ": " << root[i] << endl;
+    // Iterate through the integer vector and cast each element to double
+    for (size_t i = 0; i < int_vector.size(); ++i) {
+        double_vector[i] = static_cast<double>(int_vector[i]);
     }
 
-    // Define the range for the plot
-    double maxReal = 1.1 * max(abs(real(root[0])), abs(imag(root[0])));
-    for (const auto& r : root) 
-    {
-        maxReal = max(maxReal, 1.1 * max(abs(real(r)), abs(imag(r))));
-    }
+    return double_vector;
+}
 
-    vector<double> x(2 * RES * (maxReal + 1));
-    vector<double> y(2 * RES * (maxReal + 1));
 
-    for (int i = 0; i < x.size(); ++i) {
-        x[i] = -maxReal + (2 * maxReal / (x.size() - 1)) * i;
-    }
-    for (int i = 0; i < y.size(); ++i) {
-        y[i] = -maxReal + (2 * maxReal / (y.size() - 1)) * i;
-    }
+// Function to construct the polynomial string from coefficients
+std::string constructPolynomial(const std::vector<double>& coefficients) {
+    std::ostringstream polynomial; // To hold the polynomial string
+    int n = coefficients.size(); // Degree of the polynomial
 
-    vector<complex<double>> z(x.size() * y.size());
-    for (int i = 0; i < x.size(); i++) {
-        for (int j = 0; j < y.size(); j++) {
-            z[i * x.size() + j] = complex<double>(x[i], y[j]);
+    for (int i = 0; i < n; ++i) {
+        double coeff = coefficients[i];
+        int power = n - 1 - i; // Calculate the power
+
+        // Skip zero coefficients
+        if (coeff == 0) {
+            continue;
         }
-    }
 
-    // for(int i=0; i<z.size(); i++)
-    // {
-    //     cout<<real(z[i])<<" "<<imag(z[i])<<"\n";
-    // }
-
-    for (int i = 0; i < ITERATION; i++) 
-    {
-        for (size_t j = 0; j < z.size(); j++) 
-        {
-            z[j] = iteration_step(z[j], root);
-        }
-    }
-
-    // Find min and max values of |f(z)| for proper color scaling
-    double minVal = numeric_limits<double>::max();
-    double maxVal = numeric_limits<double>::lowest();
-    vector<int> f_values(z.size());
-
-    int minindex;
-    double dist, val;
-    for (size_t i = 0; i < z.size(); i++) 
-    {
-        minindex = 0;
-        dist = abs(z[i]-root[0]);
-        for(int j=1; j<root.size(); j++)
-        {
-            val = abs(z[i] - root[j]);
-            if(val<=dist)
-            {
-                minindex = j;
-                dist = val;
+        // Add the coefficient and variable part
+        if (polynomial.str().length() > 0) { // If not the first term
+            if (coeff > 0) {
+                polynomial << "+";
+            } else {
+                polynomial << "-";
             }
         }
-        f_values[i] = minindex;
-        val = abs(f(z[i], root));
-        if (val < minVal) minVal = val;
-        if (val > maxVal) maxVal = val;
+
+        // Handle the absolute value of the coefficient
+        if (abs(coeff) != 1 || power == 0) {
+            polynomial << abs(coeff); // Only print coefficient if it's not ±1 or if it's constant
+        }
+
+        // Handle the variable and power part
+        if (power > 0) {
+            polynomial << "x"; // Add variable x
+            if (power > 1) {
+                polynomial << "^" << power; // Add power if it's greater than 1
+            }
+        }
     }
 
-    // Avoid empty color bar range
-    if (minVal == maxVal) {
-        minVal -= 1.0;
-        maxVal += 1.0;
+    return polynomial.str(); // Return the constructed polynomial as a string
+}
+
+
+
+// Function to create a Gnuplot script to plot the roots
+void createGnuplotScript(const std::string& polynomial, const std::vector<std::complex<double>>& roots) {
+    double min_real = std::numeric_limits<double>::max();
+    double max_real = std::numeric_limits<double>::min();
+    double min_imag = std::numeric_limits<double>::max();
+    double max_imag = std::numeric_limits<double>::min();
+
+    // Calculate min and max for real and imaginary parts
+    for (const auto& root : roots) {
+        double real_part = root.real();
+        double imag_part = root.imag();
+        
+        if (real_part < min_real) min_real = real_part;
+        if (real_part > max_real) max_real = real_part;
+        if (imag_part < min_imag) min_imag = imag_part;
+        if (imag_part > max_imag) max_imag = imag_part;
     }
 
-    // Create data file for Gnuplot
-    ofstream dataFile("data.txt");
-    // for (int i = 0; i < y.size(); ++i) {
-    //     for (int j = 0; j < x.size(); ++j) {
-    //         dataFile << real(z[i * x.size() + j]) << " " << imag(z[i * x.size() + j]) << " " << f_values[i * x.size() + j] << "\n";
-    //     }
-    //     dataFile << "\n";
-    // }
-    for (int i = 0; i < x.size(); i++)
-    {
-        for(int j=0; j < y.size(); j++)
-        {
-            dataFile << x[i] << " " << y[j] << " " << f_values[i * x.size() + j] << "\n";      
-        } 
+    // Prepare polynomial title with proper formatting
+    std::string formattedPolynomial = polynomial;
+    
+    // Use regex to format the polynomial string
+    std::regex re("(\\w)\\^([0-9]+)"); // Matches variable^exponent
+    formattedPolynomial = std::regex_replace(formattedPolynomial, re, "$1^{ $2 }"); // Replace with correct formatting
+
+    std::ostringstream script;
+    script << "set title \"" << formattedPolynomial << "\"\n";
+    script << "set xlabel \"Real\"\n";
+    script << "set ylabel \"Imaginary\"\n";
+    script << "set grid\n";
+    
+    // Set dynamic ranges based on min and max values
+    script << "set xrange [" << 1.1*min_real << ":" << 1.1*max_real << "]\n"; // Add some padding
+    script << "set yrange [" << 1.1*min_imag << ":" << 1.1*max_imag << "]\n"; // Add some padding
+    script << "plot '-' with points pt 7 ps 1.5 title 'Roots'\n";
+
+    // Add the roots to the Gnuplot script
+    for (const auto& root : roots) {
+        script << root.real() << " " << root.imag() << "\n";
     }
-    dataFile << "\n";
-    dataFile.close();
+    script << "e\n"; // End of data
+    
+    // Add pause to keep the plot window open
+    script << "pause -1\n"; // Pause indefinitely until user closes the window
 
-    // Create Gnuplot script
-    std::ofstream gnuplotScript("plot.gnuplot");
-    // gnuplotScript << "set term wxt\n";  // Change to 'qt' if you prefer Qt terminal
-    gnuplotScript << "set term wxt size 1000,1000\n";  // Adjust size as needed
-    gnuplotScript << "set view map\n";
-    gnuplotScript << "set size ratio -1\n";
-
-    // Define the "jet" colormap
-    gnuplotScript << "set palette defined ( \\\n";
-    gnuplotScript << "0 0 0 0, \\\n"; // Black
-    gnuplotScript << "0.1 0 0 0.5, \\\n"; // Dark Blue
-    gnuplotScript << "0.2 0 0 1, \\\n"; // Blue
-    gnuplotScript << "0.3 0 0.5 1, \\\n"; // Cyan Blue
-    gnuplotScript << "0.4 0 1 1, \\\n"; // Cyan
-    gnuplotScript << "0.5 0.5 1 0.5, \\\n"; // Light Green
-    gnuplotScript << "0.6 1 1 0, \\\n"; // Yellow
-    gnuplotScript << "0.7 1 0.5 0, \\\n"; // Orange
-    gnuplotScript << "0.8 1 0 0, \\\n"; // Red
-    gnuplotScript << "0.9 0.5 0 0, \\\n"; // Dark Red
-    gnuplotScript << "1 0.5 0 0 )\n"; // Dark Red
-
-    gnuplotScript << "set xlabel 'Re(z)'\n";
-    gnuplotScript << "set ylabel 'Im(z)'\n";
-    gnuplotScript << "set cblabel 'Root Index'\n";
-    gnuplotScript << "set xtics font ',10'\n"; // Set smaller font for ticks and labels
-    gnuplotScript << "set ytics font ',10'\n";
-    gnuplotScript << "set xlabel 'Re(z)' font ',10'\n";
-    gnuplotScript << "set ylabel 'Im(z)' font ',10'\n";
-    gnuplotScript << "set cblabel 'Root Index' font ',10'\n";
-    gnuplotScript << "set cbtics font ',10'\n";
-    gnuplotScript << "set xrange [" << -maxReal << ":" << maxReal << "]\n";
-    gnuplotScript << "set yrange [" << -maxReal << ":" << maxReal << "]\n";
-    gnuplotScript << "set title 'Newton Fractal' font ',10'\n";
-    gnuplotScript << "unset key\n"; // Disable the plot key (legend)
-    gnuplotScript << "splot 'data.txt' using 1:2:3 with image\n";
+    // Write the script to a file
+    std::ofstream gnuplotScript("plot_roots.gp");
+    gnuplotScript << script.str();
     gnuplotScript.close();
+}
 
-    // Execute Gnuplot script
-    system("gnuplot -persist plot.gnuplot");
 
-    cout << "Interactive colormap displayed." << endl;
-    // Wait for the user to close the plot window
-    cout << "Press enter to exit..." << endl;
-    cin.get();
 
-    auto t_end = high_resolution_clock::now();
-    duration<double> elapsed = t_end - t_start;
-    cout << "\n\nImage shape: " << x.size() << "x" << y.size() << endl;
-    cout << "Time taken: " << elapsed.count() << " seconds" << endl;
 
-    // Delete the data files
-    if (remove("data.txt") != 0) 
+int main() 
+{
+    // Example: Solve the polynomial x^4 - 1 = 0
+    // std::vector<double> coefficients = {1,0,0,0,-1}; // Represents x^4 - 1
+    int size;
+    cout<<"Enter size: ";
+    cin>>size;
+    cout<<endl;
+    std::vector<double> coefficients = convertIntToDouble(generateRandomVector(size+1,-10,10));
+
+    // Construct the polynomial string
+    std::string polynomial = constructPolynomial(coefficients);
+
+    // Print the polynomial equation
+    std::cout << "The equation:\n";
+    std::cout << polynomial << " = 0\n" << std::endl;
+    try 
     {
-        std::cerr << "Error deleting data.txt" << std::endl;
+        std::vector<std::complex<double>> roots = solvePolynomial(coefficients);
+
+        // Output the roots
+        std::cout << "The roots of the polynomial are:\n";
+        for (size_t i = 0; i < roots.size(); i++) 
+        {
+            std::cout << "Root " << i + 1 << ": " << roots[i] << std::endl;
+        }
+
+        // Create Gnuplot script to plot the roots
+        createGnuplotScript(polynomial, roots);
+
+        // Execute the Gnuplot script
+        system("gnuplot plot_roots.gp");
     } 
-    else 
+    catch (const std::exception& e) 
     {
-        std::cout << "Deleted data.txt" << std::endl;
+        std::cerr << e.what() << std::endl;
     }
 
     return 0;

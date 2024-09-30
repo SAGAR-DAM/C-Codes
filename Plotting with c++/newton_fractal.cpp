@@ -11,8 +11,8 @@ using namespace std;
 using namespace chrono;
 
 const int ITERATION = 50;
-const int RES = 100;
-const int rootnumber = 10;
+const int RES = 200;
+const int rootnumber = 4;
 
 // Function to create random roots
 vector<complex<double>> create_random_root(int n) 
