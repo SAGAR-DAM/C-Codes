@@ -205,7 +205,7 @@ void createGnuplotScript(const std::string& polynomial, const std::vector<std::c
     formattedPolynomial = std::regex_replace(formattedPolynomial, re, "$1^{ $2 }"); // Replace with correct formatting
 
     std::ostringstream script;
-    script << "set title \"" << formattedPolynomial << "\"\n";
+    script << "set title \"" << formattedPolynomial << " = 0"<<"\"\n";
     script << "set xlabel \"Real\"\n";
     script << "set ylabel \"Imaginary\"\n";
     script << "set grid\n";

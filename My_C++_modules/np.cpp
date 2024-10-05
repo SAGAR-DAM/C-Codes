@@ -7,6 +7,8 @@
 #include<stdexcept>
 #include "D:\C++ codes\My_C++_modules\np.hpp"
 #include<cmath>
+#include <regex>
+#include <random>
 
 using namespace std;
 
@@ -133,6 +135,46 @@ double stdarr(const std::vector<double>& vec) {
     return stdDev;
 }
 
+// ###########################################################################
+// Function to generate a random double vector of a given size and range
+// ###########################################################################
+std::vector<double> generateRandomdoubleVector(int size, double min_value, double max_value) {
+    // Initialize a random number generator
+    std::random_device rd;  // Seed for randomness
+    std::mt19937 gen(rd()); // Mersenne Twister engine seeded with random device
+
+    // Define a uniform distribution for double values in the range [min_value, max_value]
+    std::uniform_real_distribution<> distrib(min_value, max_value);
+
+    // Create a vector of random doubles
+    std::vector<double> random_vector(size);
+    for (int i = 0; i < size; ++i) {
+        random_vector[i] = distrib(gen);
+    }
+
+    return random_vector;
+}
+
+// ###########################################################################
+// Function to generate a random integer vector of a given size and range
+// ###########################################################################
+std::vector<int> generateRandomintVector(int size, int min_value, int max_value) 
+{
+    // Initialize a random number generator
+    std::random_device rd;  // Seed for randomness
+    std::mt19937 gen(rd()); // Mersenne Twister engine seeded with random device
+
+    // Define a distribution in the range [min_value, max_value]
+    std::uniform_int_distribution<> distrib(min_value, max_value);
+
+    // Create a vector of random integers
+    std::vector<int> random_vector(size);
+    for (int i = 0; i < size; ++i) {
+        random_vector[i] = distrib(gen);
+    }
+
+    return random_vector;
+}
 
 
 

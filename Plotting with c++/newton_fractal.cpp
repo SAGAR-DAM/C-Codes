@@ -6,13 +6,14 @@
 #include <chrono>
 #include <algorithm>
 #include <limits>
+#include "D:\C++ codes\My_C++_modules\np.hpp"
 
 using namespace std;
 using namespace chrono;
 
 const int ITERATION = 50;
-const int RES = 200;
-const int rootnumber = 4;
+const int RES = 500;
+const int rootnumber = 3;
 
 // Function to create random roots
 vector<complex<double>> create_random_root(int n) 

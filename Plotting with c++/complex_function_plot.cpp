@@ -1,18 +1,20 @@
 #include <iostream>
-#include "D:\C++ codes\My_C++_modules\complex.hpp"
+#include "D:\C++ codes\My_C++_modules\np.hpp"
+// #include <complex>
 #include <fstream>
 #include <cmath>
 #include <cstdio> // For remove function
 using namespace std;
 
-complex f(complex c)
+
+Complex f(Complex c)
 {
     // complex z = complex::complex_exponenciation(c, 5.0);
     // z = complex::addcomplex(z,c);
     // z = complex::addcomplex(z,complex(-1,0));
     // z = complex::addcomplex(z,complex::divcomplex(complex(1,0),c));
 
-    complex z = complex::logcomplex(complex::sincomplex(c));
+    Complex z = Complex::logcomplex(Complex::sincomplex(c));
 
     return z;
 }
@@ -33,9 +35,9 @@ int main() {
         for (int j = 0; j <= Y_gridSize; ++j) 
         {
             double y = yMin + j * y_step;
-            complex c = complex(x,y);
-            complex z = f(c);
-            double z_r = z.get_r();//complex::abscomplex(z);
+            Complex c = Complex(x,y);
+            Complex z = f(c);
+            double z_r = z.get_r();//Complex::abscomplex(z);
             dataFile << x << " " << y << " " << z_r << "\n";
         }
         dataFile << "\n";
