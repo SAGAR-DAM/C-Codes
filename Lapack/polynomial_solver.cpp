@@ -9,6 +9,15 @@
 #include "D:\C++ codes\My_C++_modules\np.hpp"
 #include <limits>  
 #include <regex>
+#include <chrono>   // to create new random numbers each time. Visit: https://chatgpt.com/share/6700cacc-8640-8013-bc41-94054ab0dc0b
+
+// for lapack installation: https://chatgpt.com/share/6700c6a9-1158-8013-90c8-7e4225bd2664
+
+/*
+If lapack is installed in the location: "D:\C++modules\lapack-3.12.0"
+and the nonempty folder: "D:\C++modules\lapack-3.12.0\build\lib" exists
+Run the code with:  g++ -o .\polynomial_solver "D:\C++ codes\My_C++_modules\np.cpp"  .\polynomial_solver.cpp -LD:\C++modules\lapack-3.12.0\build\lib -llapack -lblas -lgfortran 
+*/
 
 using namespace std;
 
@@ -86,9 +95,9 @@ std::vector<std::complex<double>> solvePolynomial(const std::vector<double>& coe
 
 // Function to generate a random double vector of a given size and range
 std::vector<double> generateRandomDoubleVector(int size, double min_value, double max_value) {
-    // Initialize a random number generator
-    std::random_device rd;  // Seed for randomness
-    std::mt19937 gen(rd()); // Mersenne Twister engine seeded with random device
+    // Seed with a value that changes, like the current time in nanoseconds
+    unsigned seed = std::chrono::steady_clock::now().time_since_epoch().count();
+    std::mt19937 gen(seed); // Mersenne Twister engine
 
     // Define a uniform distribution for double values in the range [min_value, max_value]
     std::uniform_real_distribution<> distrib(min_value, max_value);
@@ -107,9 +116,9 @@ std::vector<double> generateRandomDoubleVector(int size, double min_value, doubl
 // Function to generate a random integer vector of a given size and range
 std::vector<int> generateRandomVector(int size, int min_value, int max_value) 
 {
-    // Initialize a random number generator
-    std::random_device rd;  // Seed for randomness
-    std::mt19937 gen(rd()); // Mersenne Twister engine seeded with random device
+    // Seed with a value that changes, like the current time in nanoseconds
+    unsigned seed = std::chrono::steady_clock::now().time_since_epoch().count();
+    std::mt19937 gen(seed); // Mersenne Twister engine
 
     // Define a distribution in the range [min_value, max_value]
     std::uniform_int_distribution<> distrib(min_value, max_value);

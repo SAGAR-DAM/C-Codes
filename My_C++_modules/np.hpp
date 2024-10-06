@@ -25,7 +25,8 @@ double meanarr(const std::vector<double>& vec);
 double stdarr(const std::vector<double>& vec);
 std::vector<double> generateRandomdoubleVector(int size, double min_value, double max_value);
 std::vector<int> generateRandomintVector(int size, int min_value, int max_value) ;
-
+// Matrix generateRandomIntMatrix(int rows, int cols, int min_value, int max_value)  ;
+// std::vector<std::vector<double>> generateRandomDoubleMatrix(int rows, int cols, double min_value, double max_value) ;
 
 
 
@@ -143,5 +144,10 @@ Matrix operator/(Matrix M1, Matrix M2);
 Matrix operator/(double a, Matrix M);
 Matrix operator^(Matrix M, int n);
 std::ostream& operator<<(std::ostream& os,Matrix& M);
+Matrix convertIntVector2ToMatrix(const std::vector<std::vector<int>>& int_matrix);
+Matrix getRandomIntMatrix(int rows, int cols, int min_value, int max_value) ;
+Matrix convertDoubleVector2ToMatrix(std::vector<std::vector<double>>& double_matrix);
+Matrix getRandomDoubleMatrix(int rows, int cols, double min_value, double max_value);
+Matrix convertIntToDoubleMatrix(Matrix& int_matrix) ;
 
 #endif // np.h

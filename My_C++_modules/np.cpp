@@ -9,6 +9,7 @@
 #include<cmath>
 #include <regex>
 #include <random>
+#include <chrono>
 
 using namespace std;
 
@@ -437,15 +438,15 @@ Complex Complex::acotcomplex(Complex c)
 }
 
 
-// Addition operator definition outside the class
+
+// Operators of the Complex class:
+//----------------------------------
+
+// Addition and subtraction operator definition outside the class
 Complex operator+(Complex c1, Complex c2) 
 {
     return Complex::addcomplex(c1,c2);
 }
-
-
-// Operators of the Complex class:
-//----------------------------------
 Complex operator-(Complex c1, Complex c2) 
 {
     return Complex::subtractcomplex(c1,c2);
@@ -1065,9 +1066,105 @@ std::ostream& operator<<(std::ostream& os, Matrix& M)
 {
     for (int i = 0; i < M.getRows(); ++i) {
         for (int j = 0; j < M.getCols(); ++j) {
-            os << std::setw(10) << M[i][j] << " ";
+            os << std::setw(3) << M[i][j] << " ";
         }
-        os << std::endl;
+        if(i!=M.getRows()-1)
+        {
+            cout<<endl;
+        }
+        // os << std::endl;
     }
     return os;
+}
+
+
+// Helper function to convert std::vector<std::vector<int>> to Matrix object
+Matrix convertIntVector2ToMatrix(const std::vector<std::vector<int>>& int_matrix) {
+    std::vector<std::vector<double>> double_matrix(int_matrix.size(), std::vector<double>(int_matrix[0].size()));
+
+    // Convert each element from int to double
+    for (int i = 0; i < int_matrix.size(); ++i) {
+        for (int j = 0; j < int_matrix[0].size(); ++j) {
+            double_matrix[i][j] = static_cast<double>(int_matrix[i][j]);
+        }
+    }
+
+    // Create a Matrix object using the double matrix
+    return Matrix(double_matrix);
+}
+
+
+// Function to generate a random integer matrix (2D vector)
+Matrix getRandomIntMatrix(int rows, int cols, int min_value, int max_value) 
+{
+    unsigned seed = std::chrono::steady_clock::now().time_since_epoch().count();
+    std::mt19937 gen(seed); // Mersenne Twister engine
+    std::uniform_int_distribution<> distrib(min_value, max_value);
+
+    // Create a 2D vector (matrix) with the given number of rows and columns
+    std::vector<std::vector<int>> random_matrix(rows, std::vector<int>(cols));
+
+    // Fill the matrix with random integer values
+    for (int i = 0; i < rows; ++i) 
+    {
+        for (int j = 0; j < cols; ++j) 
+        {
+            random_matrix[i][j] = distrib(gen); // Generate a random value for each element
+        }
+    }
+
+    return convertIntVector2ToMatrix(random_matrix);
+}
+
+
+// Helper function to convert std::vector<std::vector<double>> to Matrix object
+Matrix convertDoubleVector2ToMatrix(std::vector<std::vector<double>>& double_matrix) 
+{
+    // Create a Matrix object using the double matrix
+    return Matrix(double_matrix);  // Assuming Matrix class has a constructor that accepts vector<vector<double>>
+}
+
+
+// Function to generate a random double matrix (2D vector)
+Matrix getRandomDoubleMatrix(int rows, int cols, double min_value, double max_value) 
+{
+    unsigned seed = std::chrono::steady_clock::now().time_since_epoch().count();
+    std::mt19937 gen(seed); // Mersenne Twister engine
+    std::uniform_real_distribution<> distrib(min_value, max_value);
+
+    // Create a 2D vector (matrix) with the given number of rows and columns
+    std::vector<std::vector<double>> random_matrix(rows, std::vector<double>(cols));
+
+    // Fill the matrix with random double values
+    for (int i = 0; i < rows; ++i) 
+    {
+        for (int j = 0; j < cols; ++j) 
+        {
+            random_matrix[i][j] = distrib(gen); // Generate a random value for each element
+        }
+    }
+
+    return random_matrix;
+}
+
+
+// Function to convert an integer Matrix to a double Matrix
+Matrix convertIntToDoubleMatrix(Matrix& int_matrix) 
+{
+    // Get the number of rows and columns from the input Matrix
+    int rows = int_matrix.getRows();
+    int cols = int_matrix.getCols();
+
+    // Create a 2D vector for double values with the same size as the integer Matrix
+    std::vector<std::vector<double>> double_matrix(rows, std::vector<double>(cols));
+
+    // Convert each element from int to double
+    for (int i = 0; i < rows; ++i) {
+        for (int j = 0; j < cols; ++j) {
+            double_matrix[i][j] = static_cast<double>(int_matrix[i][j]); // Assuming you have an operator[] defined in Matrix class
+        }
+    }
+
+    // Return the new Matrix object constructed from the double matrix
+    return Matrix(double_matrix);
 }
