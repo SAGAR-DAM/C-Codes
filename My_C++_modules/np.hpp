@@ -18,11 +18,11 @@ using namespace std;
 
 // FUNCTION DECLARATION:
 double factorial(int n);
-int find_index(const std::vector<double>& array, double value);
-int find_closest_index(const std::vector<double>& array, double value);
+int find_index(std::vector<double>& array, double value);
+int find_closest_index(std::vector<double>& array, double value);
 std::vector<double> cutarr(std::vector<double> array, int minw, int maxw);
-double meanarr(const std::vector<double>& vec);
-double stdarr(const std::vector<double>& vec);
+double meanarr(std::vector<double>& vec);
+double stdarr(std::vector<double>& vec);
 std::vector<double> generateRandomdoubleVector(int size, double min_value, double max_value);
 std::vector<int> generateRandomintVector(int size, int min_value, int max_value) ;
 // Matrix generateRandomIntMatrix(int rows, int cols, int min_value, int max_value)  ;

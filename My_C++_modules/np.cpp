@@ -44,7 +44,7 @@ double factorial(int n)
 // ###########################################################################
 //          Function to find the index of a value in a vector
 // ###########################################################################
-int find_index(const std::vector<double>& array, double value) {
+int find_index(std::vector<double>& array, double value) {
     // Iterate through the vector to find the value
     for (int i = 0; i < array.size(); ++i) {
         if (array[i] == value) {
@@ -60,7 +60,7 @@ int find_index(const std::vector<double>& array, double value) {
 // ###########################################################################
 //  Function to find the index of the closest value in a vector of doubles
 // ###########################################################################
-int find_closest_index(const std::vector<double>& array, double value) {
+int find_closest_index(std::vector<double>& array, double value) {
     // Check if the vector is empty
     if (array.empty()) {
         return -1; // Return -1 if the vector is empty
@@ -95,7 +95,7 @@ std::vector<double> cutarr(std::vector<double> array, int minw, int maxw)
 // ###########################################################################
 //           Function to calculate the mean of a vector of doubles
 // ###########################################################################
-double meanarr(const std::vector<double>& vec) {
+double meanarr(std::vector<double>& vec) {
     // Check if the vector is empty to avoid division by zero
     if (vec.empty()) {
         return 0.0; // Return 0 if the vector is empty
@@ -115,7 +115,7 @@ double meanarr(const std::vector<double>& vec) {
 // ###########################################################################
 //      Function to calculate the standard deviation of a vector of doubles
 // ###########################################################################
-double stdarr(const std::vector<double>& vec) {
+double stdarr(std::vector<double>& vec) {
     if (vec.empty()) {
         return 0.0; // Return 0 if the vector is empty
     }

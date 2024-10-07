@@ -11,6 +11,10 @@
 #include <regex>
 #include <chrono>   // to create new random numbers each time. Visit: https://chatgpt.com/share/6700cacc-8640-8013-bc41-94054ab0dc0b
 
+using namespace std;
+
+
+
 // for lapack installation: https://chatgpt.com/share/6700c6a9-1158-8013-90c8-7e4225bd2664
 
 /*
@@ -19,30 +23,27 @@ and the nonempty folder: "D:\C++modules\lapack-3.12.0\build\lib" exists
 Run the code with:  g++ -o .\polynomial_solver "D:\C++ codes\My_C++_modules\np.cpp"  .\polynomial_solver.cpp -LD:\C++modules\lapack-3.12.0\build\lib -llapack -lblas -lgfortran 
 */
 
+using namespace std;
+
 extern "C" 
 {
+    // LAPACK routine to compute eigenvalues of a general matrix
     void dgeev_(char*, char*, int*, double*, int*, double*, double*, double*, int*, double*, int*, double*, int*, int*);
 }
 
-using namespace std;
 
 // Function to create a companion matrix for the polynomial
 std::vector<double> createCompanionMatrix(const std::vector<double>& coefficients) 
 {
     int n = coefficients.size() - 1;  // Degree of the polynomial
 
-    if (coefficients[n] == 0) 
-    {
-        throw std::runtime_error("Error: Leading coefficient cannot be zero.");
-    }
-
     // Companion matrix will be of size n x n
     std::vector<double> companionMatrix(n * n, 0.0);
 
-    // Fill the last column with -coefficients / a_n (a_n is the leading coefficient)
+    // Fill the last column with -coefficients / a_n
     for (int i = 0; i < n; ++i) 
     {
-        companionMatrix[i * n + (n - 1)] = -coefficients[i] / coefficients[n];  // Here we divide by the leading coefficient
+        companionMatrix[i * n + (n - 1)] = -coefficients[i] / coefficients[n];
     }
 
     // Fill the sub-diagonal with 1s
@@ -53,7 +54,6 @@ std::vector<double> createCompanionMatrix(const std::vector<double>& coefficient
 
     return companionMatrix;
 }
-
 
 
 // Function to compute roots of a polynomial using LAPACK
@@ -114,61 +114,10 @@ std::vector<std::complex<double>> solvePolynomial(const std::vector<double>& coe
 
 
 
-// Function to generate a random double vector of a given size and range
-std::vector<double> generateRandomDoubleVector(int size, double min_value, double max_value) {
-    // Seed with a value that changes, like the current time in nanoseconds
-    unsigned seed = std::chrono::steady_clock::now().time_since_epoch().count();
-    std::mt19937 gen(seed); // Mersenne Twister engine
-
-    // Define a uniform distribution for double values in the range [min_value, max_value]
-    std::uniform_real_distribution<> distrib(min_value, max_value);
-
-    // Create a vector of random doubles
-    std::vector<double> random_vector(size);
-    for (int i = 0; i < size; ++i) {
-        random_vector[i] = distrib(gen);
-    }
-
-    return random_vector;
-}
-
-
-
-// Function to generate a random integer vector of a given size and range
-std::vector<int> generateRandomVector(int size, int min_value, int max_value) 
-{
-    // Seed with a value that changes, like the current time in nanoseconds
-    unsigned seed = std::chrono::steady_clock::now().time_since_epoch().count();
-    std::mt19937 gen(seed); // Mersenne Twister engine
-
-    // Define a distribution in the range [min_value, max_value]
-    std::uniform_int_distribution<> distrib(min_value, max_value);
-
-    // Create a vector of random integers
-    std::vector<int> random_vector(size);
-    for (int i = 0; i < size; ++i) {
-        random_vector[i] = distrib(gen);
-    }
-
-    return random_vector;
-}
-
-
-// Function to convert a vector of integers to a vector of doubles
-std::vector<double> convertIntToDouble(const std::vector<int>& int_vector) {
-    std::vector<double> double_vector(int_vector.size());
-
-    // Iterate through the integer vector and cast each element to double
-    for (size_t i = 0; i < int_vector.size(); ++i) {
-        double_vector[i] = static_cast<double>(int_vector[i]);
-    }
-
-    return double_vector;
-}
-
 
 // Function to construct the polynomial string from coefficients
-std::string constructPolynomial(const std::vector<double>& coefficients) {
+std::string constructPolynomial(const std::vector<double>& coefficients) 
+{
     std::ostringstream polynomial; // To hold the polynomial string
     int n = coefficients.size(); // Degree of the polynomial
 
@@ -203,14 +152,14 @@ std::string constructPolynomial(const std::vector<double>& coefficients) {
             }
         }
     }
-
     return polynomial.str(); // Return the constructed polynomial as a string
 }
 
 
 
 // Function to create a Gnuplot script to plot the roots
-void createGnuplotScript(const std::string& polynomial, const std::vector<std::complex<double>>& roots) {
+void createGnuplotScript(const std::string& polynomial, const std::vector<std::complex<double>>& roots) 
+{
     double min_real = std::numeric_limits<double>::max();
     double max_real = std::numeric_limits<double>::min();
     double min_imag = std::numeric_limits<double>::max();
@@ -262,23 +211,28 @@ void createGnuplotScript(const std::string& polynomial, const std::vector<std::c
 
 
 
-
 int main() 
 {
     // Example: Solve the polynomial x^4 - 1 = 0
-    // std::vector<double> coefficients = {5,3,7}; // Represents x^4 - 1
+    // std::vector<double> coefficients = {1,0,0,0,-1}; // Represents x^4 - 1
     int size;
     cout<<"Enter size: ";
     cin>>size;
     cout<<endl;
-    std::vector<double> coefficients = convertIntToDouble(generateRandomVector(size+1,-10,10));
+    
+    Matrix A = getRandomIntMatrix(size,size,-10,10);
+    cout<<"The matrix:"<<endl<<A<<endl;
+
+    //get the characteristic polynomial
+    std::vector<double> coefficients = Matrix::coeff_charac(A);
 
     // Construct the polynomial string
     std::string polynomial = constructPolynomial(coefficients);
 
     // Print the polynomial equation
-    std::cout << "The equation:\n";
+    std::cout << "The Characteristic equation:\n";
     std::cout << polynomial << " = 0\n" << std::endl;
+
     try 
     {
         std::vector<std::complex<double>> roots = solvePolynomial(coefficients);
@@ -298,8 +252,10 @@ int main()
     } 
     catch (const std::exception& e) 
     {
+        cout<<"error occured !!"<<endl;
         std::cerr << e.what() << std::endl;
     }
+
 
     return 0;
 }
