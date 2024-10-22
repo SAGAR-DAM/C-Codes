@@ -275,6 +275,10 @@ int main()
     setSmallValuesToZero(cross_varify, 1e-8); // Call the function to set small values to zero
 
     cout<<endl<<"cross_varify: A.sol = "<<"("<<cross_varify<<")"<<endl;
-    cout<<"With error level: "<<error_range/num_variables;
+    cout<<"With error level: "<<error_range/num_variables<<endl;
+
+    std::cout<<"Press any key to exit"<<endl;
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Ignore leftover input
+    std::cin.get();
     return 0;
 }

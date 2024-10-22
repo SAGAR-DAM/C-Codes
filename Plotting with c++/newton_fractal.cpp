@@ -11,16 +11,19 @@
 using namespace std;
 using namespace chrono;
 
+
 const int ITERATION = 50;
-const int RES = 500;
-const int rootnumber = 3;
+const int RES = 200;
+const int rootnumber = 7;
 
 // Function to create random roots
 vector<complex<double>> create_random_root(int n) 
 {
     vector<complex<double>> root;
-    random_device rd;
-    mt19937 gen(rd());
+
+    // Use current time to seed the random number generator
+    unsigned seed = chrono::system_clock::now().time_since_epoch().count();
+    mt19937 gen(seed);
     uniform_real_distribution<> dis(-1.0, 1.0);
 
     for (int i = 0; i < n; ++i) 
@@ -28,6 +31,7 @@ vector<complex<double>> create_random_root(int n)
         complex<double> z(dis(gen), dis(gen));
         root.push_back(z);
     }
+
     return root;
 }
 
@@ -87,8 +91,8 @@ int main() {
     auto t_start = high_resolution_clock::now();
 
     // Generate random roots
-    //vector<complex<double>> root = create_random_root(rootnumber);
-    vector<complex<double>> root = create_circ_root(rootnumber);
+    vector<complex<double>> root = create_random_root(rootnumber);
+    // vector<complex<double>> root = create_circ_root(rootnumber);
 
     cout << "Roots:" << endl;
     for (size_t i = 0; i < root.size(); i++) 

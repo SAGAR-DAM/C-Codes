@@ -1,3 +1,0 @@
-D:/C++ codes/Libtorch/build/CMakeFiles/Libtorch.dir
-D:/C++ codes/Libtorch/build/CMakeFiles/edit_cache.dir
-D:/C++ codes/Libtorch/build/CMakeFiles/rebuild_cache.dir

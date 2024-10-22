@@ -214,7 +214,7 @@ void createGnuplotScript(const std::string& polynomial, const std::vector<std::c
 int main() 
 {
     // Example: Solve the polynomial x^4 - 1 = 0
-    // std::vector<double> coefficients = {1,0,0,0,-1}; // Represents x^4 - 1
+    // std::vector<double> coefficients = {1,0,0,0,4}; // Represents x^4 - 1
     int size;
     cout<<"Enter size: ";
     cin>>size;

@@ -8,6 +8,8 @@
 #include <fstream>
 #include <regex>
 
+using namespace std;
+
 // for lapack installation: https://chatgpt.com/share/6700c6a9-1158-8013-90c8-7e4225bd2664
 
 /*
@@ -275,5 +277,9 @@ int main() {
         std::cerr << e.what() << std::endl;
     }
 
+    std::cout<<"Press any key to exit";
+
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Ignore leftover input
+    std::cin.get();
     return 0;
 }
