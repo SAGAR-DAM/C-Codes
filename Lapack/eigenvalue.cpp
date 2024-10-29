@@ -8,110 +8,29 @@
 #include <cstdio>
 #include "D:\C++ codes\My_C++_modules\np.hpp"
 #include <limits>  
+#include <stdexcept>
 #include <regex>
+#include <iomanip>
 #include <chrono>   // to create new random numbers each time. Visit: https://chatgpt.com/share/6700cacc-8640-8013-bc41-94054ab0dc0b
 
 using namespace std;
 
 
-
-// for lapack installation: https://chatgpt.com/share/6700c6a9-1158-8013-90c8-7e4225bd2664
-
-/*
-If lapack is installed in the location: "D:\C++modules\lapack-3.12.0"
-and the nonempty folder: "D:\C++modules\lapack-3.12.0\build\lib" exists
-Run the code with:  g++ -o .\polynomial_solver "D:\C++ codes\My_C++_modules\np.cpp"  .\polynomial_solver.cpp -LD:\C++modules\lapack-3.12.0\build\lib -llapack -lblas -lgfortran 
-*/
-
-using namespace std;
-
-extern "C" 
+// Function to create n-th roots of unity
+vector<complex<double>> create_circ_root(int n) 
 {
-    // LAPACK routine to compute eigenvalues of a general matrix
-    void dgeev_(char*, char*, int*, double*, int*, double*, double*, double*, int*, double*, int*, double*, int*, int*);
-}
+    vector<complex<double>> roots;
+    double angle_increment = 2.0 * M_PI / n;
 
-
-// Function to create a companion matrix for the polynomial
-std::vector<double> createCompanionMatrix(const std::vector<double>& coefficients) 
-{
-    int n = coefficients.size() - 1;  // Degree of the polynomial
-
-    // Companion matrix will be of size n x n
-    std::vector<double> companionMatrix(n * n, 0.0);
-
-    // Fill the last column with -coefficients / a_n
-    for (int i = 0; i < n; ++i) 
+    for (int k = 0; k < n; ++k) 
     {
-        companionMatrix[i * n + (n - 1)] = -coefficients[i] / coefficients[n];
-    }
-
-    // Fill the sub-diagonal with 1s
-    for (int i = 1; i < n; ++i) 
-    {
-        companionMatrix[i * n + (i - 1)] = 1.0;
-    }
-
-    return companionMatrix;
-}
-
-
-// Function to compute roots of a polynomial using LAPACK
-std::vector<std::complex<double>> solvePolynomial(const std::vector<double>& coefficients) 
-{
-    int degree = coefficients.size() - 1;
-
-    if (degree == 0) 
-    {
-        throw std::runtime_error("Error: Not a valid polynomial (degree 0).");
-    }
-
-    std::vector<double> companionMatrix = createCompanionMatrix(coefficients);
-
-    // Arrays for eigenvalues
-    std::vector<double> wr(degree), wi(degree);
-
-    // LAPACK parameters
-    int n = degree;
-    int lda = n;
-    int info;
-    int lwork = 4 * n;
-    std::vector<double> work(4 * n);  // Work array
-
-    // Temporary arrays for left and right eigenvectors (not needed)
-    std::vector<double> vl(1), vr(1);
-    char jobvl = 'N';  // No left eigenvectors are computed
-    char jobvr = 'N';  // No right eigenvectors are computed
-
-    // Call LAPACK routine to compute the eigenvalues (roots)
-    dgeev_(&jobvl, &jobvr, &n, companionMatrix.data(), &lda, wr.data(), wi.data(), vl.data(), &lda, vr.data(), &lda, work.data(), &lwork, &info);
-
-    // Check for success
-    if (info != 0) 
-    {
-        throw std::runtime_error("Error: dgeev failed with info = " + std::to_string(info));
-    }
-
-    // Collect the inverted roots as complex numbers
-    std::vector<std::complex<double>> roots;
-    for (int i = 0; i < degree; ++i) 
-    {
-        // Invert the root (1 / root), considering both real and imaginary parts
-        std::complex<double> root(wr[i], wi[i]);
-
-        // Ensure we are not dividing by zero
-        if (root == std::complex<double>(0.0, 0.0)) 
-        {
-            throw std::runtime_error("Error: Encountered zero root, cannot invert.");
-        }
-
-        // Invert the root
-        roots.push_back(1.0 / root);
+        double angle = k * angle_increment;
+        complex<double> z(50*cos(angle), 50*sin(angle));
+        roots.push_back(z);
     }
 
     return roots;
 }
-
 
 
 
@@ -157,6 +76,95 @@ std::string constructPolynomial(const std::vector<double>& coefficients)
 
 
 
+// Function to evaluate the polynomial at a given complex number
+std::complex<double> evalpolynomial(const std::vector<double>& coeffs, std::complex<double> x) {
+    std::complex<double> result = 0.0;
+    for (size_t i = 0; i < coeffs.size(); ++i) {
+        result += coeffs[i] * std::pow(x, coeffs.size() - 1 - i);
+    }
+    return result;
+}
+
+
+
+// Function to evaluate the derivative of the polynomial at a given complex number
+std::complex<double> derivative(const std::vector<double>& coeffs, std::complex<double> x) {
+    std::complex<double> result = 0.0;
+    for (size_t i = 0; i < coeffs.size() - 1; ++i) {
+        result += coeffs[i] * static_cast<std::complex<double>>(coeffs.size() - 1 - i) * std::pow(x, coeffs.size() - 2 - i);
+    }
+    return result;
+}
+
+
+
+// Newton-Raphson method with tolerance to predict root
+std::complex<double> predictRoot(const std::vector<double>& coeffs, std::complex<double> initialSeed, double tolerance, int maxIterations) {
+    std::complex<double> x = initialSeed;
+
+    for (int i = 0; i < maxIterations; ++i) {
+        std::complex<double> f_x = evalpolynomial(coeffs, x);
+        std::complex<double> f_prime_x = derivative(coeffs, x);
+
+        if (f_prime_x == 0.0) {
+            std::cerr << "Derivative is zero. No solution found." << std::endl;
+            return x;
+        }
+
+        // Update x using Newton-Raphson formula
+        x = x - f_x / f_prime_x;
+
+        // Check if the error (|f(x)|) is within tolerance
+        if (std::abs(f_x) < tolerance) {
+            //std::cout << "Converged in " << i + 1 << " iterations." << std::endl;
+            break;
+        }
+
+        // Display the current iteration and value
+        //std::cout << "Iteration " << i + 1 << ": x = " << std::setprecision(10) << x << ", |f(x)| = " << std::abs(f_x) << std::endl;
+    }
+
+    return x;
+}
+
+
+
+// Function to remove duplicate roots that are within a specified tolerance
+std::vector<std::complex<double>> removeCloseDuplicates(const std::vector<std::complex<double>>& roots, double tolerance = 1e-10) 
+{
+    std::vector<std::complex<double>> uniqueRoots;
+
+    for (const auto& root : roots) {
+        bool isDuplicate = false;
+        
+        // Check against all unique roots found so far
+        for (auto& uniqueRoot : uniqueRoots) {
+            if (std::abs(root - uniqueRoot) < tolerance) {
+                // If root is close to uniqueRoot, average them and mark as duplicate
+                uniqueRoot = (uniqueRoot + root) / 2.0;
+                isDuplicate = true;
+                break;
+            }
+        }
+
+        // If no close duplicate found, add root to uniqueRoots
+        if (!isDuplicate) {
+            uniqueRoots.push_back(root);
+        }
+    }
+
+    // Set small imaginary parts to zero for all unique roots
+    for (auto& root : uniqueRoots) {
+        if (std::abs(root.imag()) < tolerance) {
+            root = std::complex<double>(root.real(), 0.0);  // Set imaginary part to 0
+        }
+    }
+
+    return uniqueRoots;
+}
+
+
+
 // Function to create a Gnuplot script to plot the roots
 void createGnuplotScript(const std::string& polynomial, const std::vector<std::complex<double>>& roots) 
 {
@@ -184,15 +192,16 @@ void createGnuplotScript(const std::string& polynomial, const std::vector<std::c
     formattedPolynomial = std::regex_replace(formattedPolynomial, re, "$1^{ $2 }"); // Replace with correct formatting
 
     std::ostringstream script;
-    script << "set title \"" << formattedPolynomial << " = 0"<<"\"\n";
+    script << "set title \"" << "Eigenvalues of the given matrix (roots of characteristic eq)\\n" << formattedPolynomial << " = 0"<<"\"\n";
     script << "set xlabel \"Real\"\n";
     script << "set ylabel \"Imaginary\"\n";
     script << "set grid\n";
     
     // Set dynamic ranges based on min and max values
-    script << "set xrange [" << 1.1*min_real << ":" << 1.1*max_real << "]\n"; // Add some padding
-    script << "set yrange [" << 1.1*min_imag << ":" << 1.1*max_imag << "]\n"; // Add some padding
-    script << "plot '-' with points pt 7 ps 1.5 title 'Roots'\n";
+    script << "set xrange [" << -0.5+1.1*min_real << ":" << 0.5+1.1*max_real << "]\n"; // Add some padding
+    script << "set yrange [" << -0.5+1.1*min_imag << ":" << 0.5+1.1*max_imag << "]\n"; // Add some padding
+    script << "plot '-' with points pt 7 ps 1.5 lc rgb 'red' title 'Roots'\n";
+
 
     // Add the roots to the Gnuplot script
     for (const auto& root : roots) {
@@ -211,17 +220,18 @@ void createGnuplotScript(const std::string& polynomial, const std::vector<std::c
 
 
 
+
 int main() 
 {
-    // Example: Solve the polynomial x^4 - 1 = 0
-    // std::vector<double> coefficients = {1,0,0,0,4}; // Represents x^4 - 1
     int size;
     cout<<"Enter size: ";
     cin>>size;
     cout<<endl;
     
     Matrix A = getRandomIntMatrix(size,size,-10,10);
-    cout<<"The matrix:"<<endl<<A<<endl;
+    cout<<"========================================================================================================================"<<endl;
+    cout<<"The Matrix:"<<endl<<"-------------"<<endl<<A<<endl<<endl;
+    cout<<"========================================================================================================================"<<endl<<endl;
 
     //get the characteristic polynomial
     std::vector<double> coefficients = Matrix::coeff_charac(A);
@@ -230,22 +240,48 @@ int main()
     std::string polynomial = constructPolynomial(coefficients);
 
     // Print the polynomial equation
-    std::cout << "The Characteristic equation:\n";
+    std::cout << "The Characteristic Polynomial:\n";
     std::cout << polynomial << " = 0\n" << std::endl;
 
     try 
     {
-        std::vector<std::complex<double>> roots = solvePolynomial(coefficients);
-
-        // Output the roots
-        std::cout << "The roots of the polynomial are:\n";
-        for (size_t i = 0; i < roots.size(); i++) 
+        vector<complex<double>> seeds = create_circ_root(size*size);
+        std::vector<std::complex<double>> roots; // Vector to store the final roots
+        int counter = 0;
+        // Loop over each seed to find a root using predictRoot
+        for (const auto& seed : seeds) 
         {
-            std::cout << "Root " << i + 1 << ": " << roots[i] << std::endl;
+            std::complex<double> root = predictRoot(coefficients, seed, 1e-10, size*size*size); // tolerance = 1e-6, maxIterations = 100
+            if(abs(evalpolynomial(coefficients,root))<0.1)
+            {
+                roots.push_back(root);
+            }
+            counter = counter+1 ;
+            if(removeCloseDuplicates(roots).size()==size)
+            {   
+                cout<<"Loop run counter: "<<counter<<endl<<endl;
+                cout<<"========================================================================================================================"<<endl<<endl;
+                break;
+            }
         }
 
-        // Create Gnuplot script to plot the roots
-        createGnuplotScript(polynomial, roots);
+        // Remove duplicates within a certain tolerance
+        std::vector<std::complex<double>> uniqueRoots = removeCloseDuplicates(roots);
+
+        for (size_t i = 0; i < uniqueRoots.size(); ++i) {
+            std::complex<double> root = uniqueRoots[i];
+            
+            // Calculate the error if required (assuming a function characPolyError exists)
+            double error = std::abs(evalpolynomial(coefficients, root));  // Example error calculation
+
+            // Print the root index, root value, and error, all justified
+            std::cout << std::left << "Root " << i + 1 << ": " 
+                    << std::setw(1) << std::fixed << std::setprecision(8) << "(" << root.real() << ", " << root.imag() << ")"
+                    << "\twith Error Charac_poly(x) ~ " << std::scientific << std::setprecision(2) << error << "\n";
+        }
+        
+        // Create Gnuplot script to plot the unique roots
+        createGnuplotScript(polynomial, uniqueRoots);
 
         // Execute the Gnuplot script
         system("gnuplot plot_roots.gp");

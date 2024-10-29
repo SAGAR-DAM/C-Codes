@@ -91,6 +91,7 @@ int main() {
     auto t_start = high_resolution_clock::now();
 
     // Generate random roots
+    //vector<complex<double>> root = create_random_root(rootnumber)
     vector<complex<double>> root = create_random_root(rootnumber);
     // vector<complex<double>> root = create_circ_root(rootnumber);
 
@@ -217,8 +218,8 @@ int main() {
     gnuplotScript << "set ylabel 'Im(z)' font ',10'\n";
     gnuplotScript << "set cblabel 'Root Index' font ',10'\n";
     gnuplotScript << "set cbtics font ',10'\n";
-    gnuplotScript << "set xrange [" << -maxReal << ":" << maxReal << "]\n";
-    gnuplotScript << "set yrange [" << -maxReal << ":" << maxReal << "]\n";
+    gnuplotScript << "set xrange [" << -0.2-maxReal << ":" << 0.2+maxReal << "]\n";
+    gnuplotScript << "set yrange [" << -0.2-maxReal << ":" << 0.2+maxReal << "]\n";
     gnuplotScript << "set title 'Newton Fractal' font ',10'\n";
     gnuplotScript << "unset key\n"; // Disable the plot key (legend)
     gnuplotScript << "splot 'data.txt' using 1:2:3 with image\n";

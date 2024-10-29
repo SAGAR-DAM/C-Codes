@@ -1,84 +1,76 @@
 #include <iostream>
 #include <vector>
 #include <complex>
-#include <cmath>
+#include <iomanip>
+#include <set>
 
-using namespace std;
-
-// Function to compute the value of a polynomial at a given point z
-complex<double> evaluatePolynomial(const vector<double>& coefficients, complex<double> z) 
-{
-    complex<double> result = 0.0;
-    int n = coefficients.size() - 1; // degree of polynomial
-
-    for (int i = 0; i <= n; ++i) {
-        result += coefficients[i] * pow(z, n - i);
+// Function to evaluate the polynomial at a given complex number
+std::complex<double> polynomial(const std::vector<double>& coeffs, std::complex<double> x) {
+    std::complex<double> result = 0.0;
+    for (size_t i = 0; i < coeffs.size(); ++i) {
+        result += coeffs[i] * std::pow(x, coeffs.size() - 1 - i);
     }
-
     return result;
 }
 
-// Function to apply the Durand-Kerner method to find all roots of a polynomial
-vector<complex<double>> findRoots(const vector<double>& coefficients, double epsilon = 1e-8, int maxIterations = 1000) 
-{
-    int n = coefficients.size() - 1; // degree of polynomial
-    vector<complex<double>> roots(n);
-
-    // Initial guesses for roots (usually on the unit circle in the complex plane)
-    for (int i = 0; i < n; ++i) {
-        roots[i] = polar(1.0, 2.0 * M_PI * i / n);
+// Function to evaluate the derivative of the polynomial at a given complex number
+std::complex<double> derivative(const std::vector<double>& coeffs, std::complex<double> x) {
+    std::complex<double> result = 0.0;
+    for (size_t i = 0; i < coeffs.size() - 1; ++i) {
+        result += coeffs[i] * static_cast<std::complex<double>>(coeffs.size() - 1 - i) * std::pow(x, coeffs.size() - 2 - i);
     }
-
-    // Iterative refinement using Durand-Kerner method
-    for (int iter = 0; iter < maxIterations; ++iter) {
-        vector<complex<double>> newRoots(n);
-
-        for (int i = 0; i < n; ++i) {
-            complex<double> numerator = evaluatePolynomial(coefficients, roots[i]);
-            complex<double> denominator = 1.0;
-
-            for (int j = 0; j < n; ++j) {
-                if (j != i) {
-                    denominator *= (roots[i] - roots[j]);
-                }
-            }
-
-            newRoots[i] = roots[i] - numerator / denominator;
-        }
-
-        // Check convergence
-        bool converged = true;
-        for (int i = 0; i < n; ++i) {
-            if (abs(newRoots[i] - roots[i]) > epsilon) {
-                converged = false;
-                break;
-            }
-        }
-
-        if (converged) {
-            return newRoots; // Roots found
-        }
-
-        roots = newRoots;
-    }
-
-    cerr << "Warning: Maximum iterations reached without convergence." << endl;
-    return roots; // Return current roots (may not be accurate)
+    return result;
 }
 
-int main() 
-{
-    // Example usage: Solve x^3 - 6x^2 + 11x - 6 = 0
-    vector<double> coefficients = { 4,0,1 }; // coefficients in descending order of powers
 
-    vector<complex<double>> roots = findRoots(coefficients);
+// Newton-Raphson method for complex numbers
+std::complex<double> newtonRaphson(const std::vector<double>& coeffs, std::complex<double> initialSeed, int iterations) {
+    std::complex<double> x = initialSeed;
 
-    cout << "Roots of the polynomial:" << endl;
-    for (auto root : roots) {
-        cout << root << endl;
+    for (int i = 0; i < iterations; ++i) {
+        std::complex<double> f_x = polynomial(coeffs, x);
+        std::complex<double> f_prime_x = derivative(coeffs, x);
+
+        if (f_prime_x == 0.0) {
+            std::cerr << "Derivative is zero. No solution found." << std::endl;
+            return x;
+        }
+
+        // Update x using Newton-Raphson formula
+        x = x - f_x / f_prime_x;
+
+        // Display the current iteration and value
+        std::cout << "Iteration " << i + 1 << ": x = " << std::setprecision(10) << x << std::endl;
     }
 
-    // cout<<abs(std::complex<double>(1,1));
+
+    return x;
+}
+
+
+
+int main() {
+    // Define the polynomial coefficients for x^5 + 3x^4 - 5x^3 + 10x^2 + 17x - 30
+    std::vector<double> coefficients = {1,3,-5,10,17,-30}; // a0, a1, a2, a3, a4, a5 (for x^5)
+
+    // User input for complex initial seed
+    double realPart, imagPart;
+    std::cout << "Enter the real part of the initial seed: ";
+    std::cin >> realPart;
+    std::cout << "Enter the imaginary part of the initial seed: ";
+    std::cin >> imagPart;
+    std::complex<double> initialSeed(realPart, imagPart);
+    
+    int iterations = 100; // Number of iterations
+
+    // Apply Newton-Raphson method
+    std::complex<double> root = newtonRaphson(coefficients, initialSeed, iterations);
+    
+    // Calculate f(root) after iterations
+    std::complex<double> f_root = polynomial(coefficients, root);
+    
+    std::cout << "Approximate root: " << std::setprecision(10) << root << std::endl;
+    std::cout << "Value of f(root): " << std::setprecision(10) << f_root << std::endl;
 
     return 0;
 }

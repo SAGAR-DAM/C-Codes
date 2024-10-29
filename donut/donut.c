@@ -57,7 +57,7 @@ int main() {
         B += 0.36; // Adjusted to slow down rotation
 
         // Pause for a moment to slow down the animation
-        usleep(20000); // Adjusted to slow down the animation
+        usleep(200); // Adjusted to slow down the animation
     }
     return 0;
 }
