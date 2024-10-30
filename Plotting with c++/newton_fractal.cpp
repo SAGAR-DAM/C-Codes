@@ -12,8 +12,8 @@ using namespace std;
 using namespace chrono;
 
 
-const int ITERATION = 50;
-const int RES = 200;
+const int ITERATION = 70;
+const int RES = 350;
 const int rootnumber = 7;
 
 // Function to create random roots
@@ -172,12 +172,6 @@ int main() {
 
     // Create data file for Gnuplot
     ofstream dataFile("data.txt");
-    // for (int i = 0; i < y.size(); ++i) {
-    //     for (int j = 0; j < x.size(); ++j) {
-    //         dataFile << real(z[i * x.size() + j]) << " " << imag(z[i * x.size() + j]) << " " << f_values[i * x.size() + j] << "\n";
-    //     }
-    //     dataFile << "\n";
-    // }
     for (int i = 0; i < x.size(); i++)
     {
         for(int j=0; j < y.size(); j++)
@@ -187,6 +181,15 @@ int main() {
     }
     dataFile << "\n";
     dataFile.close();
+
+    // Create data for roots file for Gnuplot
+    ofstream dataFile1("roots.txt");
+    for (int i = 0; i < rootnumber; i++)
+    {
+        dataFile1 << real(root[i]) << " " << imag(root[i]) << 1 << "\n";      
+    }
+    dataFile1 << "\n";
+    dataFile1.close();
 
     // Create Gnuplot script
     std::ofstream gnuplotScript("plot.gnuplot");
@@ -218,11 +221,13 @@ int main() {
     gnuplotScript << "set ylabel 'Im(z)' font ',10'\n";
     gnuplotScript << "set cblabel 'Root Index' font ',10'\n";
     gnuplotScript << "set cbtics font ',10'\n";
-    gnuplotScript << "set xrange [" << -0.2-maxReal << ":" << 0.2+maxReal << "]\n";
-    gnuplotScript << "set yrange [" << -0.2-maxReal << ":" << 0.2+maxReal << "]\n";
+    gnuplotScript << "set xrange [" << -maxReal << ":" << maxReal << "]\n";
+    gnuplotScript << "set yrange [" << -maxReal << ":" << maxReal << "]\n";
     gnuplotScript << "set title 'Newton Fractal' font ',10'\n";
     gnuplotScript << "unset key\n"; // Disable the plot key (legend)
-    gnuplotScript << "splot 'data.txt' using 1:2:3 with image\n";
+    gnuplotScript << "splot 'data.txt' using 1:2:3 with image, \\\n";
+    gnuplotScript << "      'roots.txt' using 1:2:(0) with points pt 7 ps 2 lc rgb 'white'\n";
+
     gnuplotScript.close();
 
     // Execute Gnuplot script
@@ -246,6 +251,16 @@ int main() {
     else 
     {
         std::cout << "Deleted data.txt" << std::endl;
+    }
+
+    // Delete the data files
+    if (remove("roots.txt") != 0) 
+    {
+        std::cerr << "Error deleting roots.txt" << std::endl;
+    } 
+    else 
+    {
+        std::cout << "Deleted roots.txt" << std::endl;
     }
 
     return 0;

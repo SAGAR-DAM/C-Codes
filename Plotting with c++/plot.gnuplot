@@ -22,8 +22,9 @@ set xlabel 'Re(z)' font ',10'
 set ylabel 'Im(z)' font ',10'
 set cblabel 'Root Index' font ',10'
 set cbtics font ',10'
-set xrange [-1.27859:1.27859]
-set yrange [-1.27859:1.27859]
+set xrange [-1.08608:1.08608]
+set yrange [-1.08608:1.08608]
 set title 'Newton Fractal' font ',10'
 unset key
-splot 'data.txt' using 1:2:3 with image
+splot 'data.txt' using 1:2:3 with image, \
+      'roots.txt' using 1:2:(0) with points pt 7 ps 2 lc rgb 'white'
