@@ -1,285 +1,123 @@
 #include <iostream>
 #include <vector>
+#include <cmath>
+#include <limits>
 #include <random>
 #include <chrono>
-#include <sstream>
-#include <stdexcept>
-#include <cmath>
-#include <fstream>
-#include <regex>
 
 using namespace std;
 
-// for lapack installation: https://chatgpt.com/share/6700c6a9-1158-8013-90c8-7e4225bd2664
-
-/*
-If lapack is installed in the location: "D:\C++modules\lapack-3.12.0"
-and the nonempty folder: "D:\C++modules\lapack-3.12.0\build\lib" exists
-Run the code with:  g++ -o .\polynomial_solver "D:\C++ codes\My_C++_modules\np.cpp"  .\polynomial_solver.cpp -LD:\C++modules\lapack-3.12.0\build\lib -llapack -lblas -lgfortran 
-*/
-
-
-extern "C" {
-    // LAPACK routine to solve a system of linear equations Ax = B
-    void dgesv_(int*, int*, double*, int*, int*, double*, int*, int*);
-}
-
-// Function to generate a single random double in a given range
-double generateRandomDouble(double min_value, double max_value) 
-{
-    // Seed with a value that changes, like the current time in nanoseconds
-    unsigned seed = std::chrono::steady_clock::now().time_since_epoch().count();
-    std::mt19937 gen(seed); // Mersenne Twister engine
-
-    // Define a uniform distribution for double values in the range [min_value, max_value]
-    std::uniform_real_distribution<> distrib(min_value, max_value);
-
-    // Generate and return a single random double
-    return distrib(gen);
-}
-
-
-// Function to generate a single random integer in a given range
-int generateRandomNumber(int min_value, int max_value) 
-{
-    // Seed with a value that changes, like the current time in nanoseconds
-    unsigned seed = std::chrono::steady_clock::now().time_since_epoch().count();
-    std::mt19937 gen(seed); // Mersenne Twister engine
-
-    // Define a distribution in the range [min_value, max_value]
-    std::uniform_int_distribution<> distrib(min_value, max_value);
-
-    // Generate and return a single random number
-    return distrib(gen);
-}
-
-
-// Function to generate a random double vector
-std::vector<double> generateRandomDoubleVector(int size, double min_value, double max_value) {
-    unsigned seed = std::chrono::steady_clock::now().time_since_epoch().count();
-    std::mt19937 gen(seed); // Mersenne Twister engine
-    std::uniform_real_distribution<> distrib(min_value, max_value);
-
-    std::vector<double> random_vector(size);
-    for (int i = 0; i < size; ++i) {
-        random_vector[i] = distrib(gen);
-    }
-
-    return random_vector;
-}
-
-
-// Function to generate a random integer vector of a given size and range
-std::vector<int> generateRandomVector(int size, int min_value, int max_value) 
-{
-    // Seed with a value that changes, like the current time in nanoseconds
-    unsigned seed = std::chrono::steady_clock::now().time_since_epoch().count();
-    std::mt19937 gen(seed); // Mersenne Twister engine
-
-    // Define a distribution in the range [min_value, max_value]
-    std::uniform_int_distribution<> distrib(min_value, max_value);
-
-    // Create a vector of random integers
-    std::vector<int> random_vector(size);
-    for (int i = 0; i < size; ++i) {
-        random_vector[i] = distrib(gen);
-    }
-
-    return random_vector;
-}
-
-
-
 // Function to generate a random integer matrix (2D vector)
-std::vector<std::vector<int>> generateRandomIntMatrix(int rows, int cols, int min_value, int max_value) 
-{
-    unsigned seed = std::chrono::steady_clock::now().time_since_epoch().count();
-    std::mt19937 gen(seed); // Mersenne Twister engine
-    std::uniform_int_distribution<> distrib(min_value, max_value);
+vector<vector<double>> generateRandomDoubleMatrix(int rows, int cols, double min_value, double max_value) {
+    unsigned seed = chrono::steady_clock::now().time_since_epoch().count();
+    mt19937 gen(seed); // Mersenne Twister engine
+    uniform_real_distribution<> distrib(min_value, max_value);
 
-    // Create a 2D vector (matrix) with the given number of rows and columns
-    std::vector<std::vector<int>> random_matrix(rows, std::vector<int>(cols));
-
-    // Fill the matrix with random integer values
-    for (int i = 0; i < rows; ++i) 
-    {
-        for (int j = 0; j < cols; ++j) 
-        {
+    vector<vector<double>> random_matrix(rows, vector<double>(cols));
+    for (int i = 0; i < rows; ++i) {
+        for (int j = 0; j < cols; ++j) {
             random_matrix[i][j] = distrib(gen); // Generate a random value for each element
         }
     }
-
     return random_matrix;
 }
 
 
+// Function to generate a random integer matrix (2D vector) with double type entries
+vector<vector<double>> generateRandomIntMatrix(int rows, int cols, int min_value, int max_value) {
+    unsigned seed = chrono::steady_clock::now().time_since_epoch().count();
+    mt19937 gen(seed); // Mersenne Twister engine
+    uniform_int_distribution<int> distrib(min_value, max_value);
 
-// Function to generate a random double matrix (2D vector)
-std::vector<std::vector<double>> generateRandomDoubleMatrix(int rows, int cols, double min_value, double max_value) 
-{
-    unsigned seed = std::chrono::steady_clock::now().time_since_epoch().count();
-    std::mt19937 gen(seed); // Mersenne Twister engine
-    std::uniform_real_distribution<> distrib(min_value, max_value);
-
-    // Create a 2D vector (matrix) with the given number of rows and columns
-    std::vector<std::vector<double>> random_matrix(rows, std::vector<double>(cols));
-
-    // Fill the matrix with random double values
-    for (int i = 0; i < rows; ++i) 
-    {
-        for (int j = 0; j < cols; ++j) 
-        {
-            random_matrix[i][j] = distrib(gen); // Generate a random value for each element
+    vector<vector<double>> random_matrix(rows, vector<double>(cols));
+    for (int i = 0; i < rows; ++i) {
+        for (int j = 0; j < cols; ++j) {
+            random_matrix[i][j] = static_cast<double>(distrib(gen)); // Generate a random integer and cast to double
         }
     }
-
     return random_matrix;
 }
 
 
+// Function to perform Gaussian elimination to solve Ax = B
+vector<double> gaussianElimination(vector<vector<double>>& A, vector<double>& B) {
+    int n = A.size();
+    
+    // Forward elimination
+    for (int i = 0; i < n; i++) {
+        // Partial pivoting
+        int maxRow = i;
+        for (int k = i + 1; k < n; k++) {
+            if (fabs(A[k][i]) > fabs(A[maxRow][i])) {
+                maxRow = k;
+            }
+        }
+        // Swap rows in A and B
+        swap(A[i], A[maxRow]);
+        swap(B[i], B[maxRow]);
 
-// Function to convert an integer to a double
-double convertIntToDouble(int value) {
-    // Use static_cast to convert the integer to a double
-    return static_cast<double>(value);
-}
-
-
-// Function to convert a vector of integers to a vector of doubles
-std::vector<double> convertIntToDoubleVector(const std::vector<int>& int_vector) {
-    std::vector<double> double_vector(int_vector.size());
-
-    // Iterate through the integer vector and cast each element to double
-    for (size_t i = 0; i < int_vector.size(); ++i) {
-        double_vector[i] = static_cast<double>(int_vector[i]);
-    }
-
-    return double_vector;
-}
-
-
-// Function to convert an integer matrix to a double matrix
-std::vector<std::vector<double>> convertIntMatrixToDouble(const std::vector<std::vector<int>>& int_matrix) 
-{
-    int rows = int_matrix.size(); // Number of rows in the matrix
-    int cols = int_matrix[0].size(); // Number of columns in the matrix
-
-    // Create a 2D vector (matrix) for double values with the same size as the integer matrix
-    std::vector<std::vector<double>> double_matrix(rows, std::vector<double>(cols));
-
-    // Convert each element from int to double
-    for (int i = 0; i < rows; ++i) 
-    {
-        for (int j = 0; j < cols; ++j) 
-        {
-            double_matrix[i][j] = static_cast<double>(int_matrix[i][j]);
+        // Make all rows below this one 0 in current column
+        for (int k = i + 1; k < n; k++) {
+            double c = A[k][i] / A[i][i];
+            for (int j = i; j < n; j++) {
+                A[k][j] -= c * A[i][j];
+            }
+            B[k] -= c * B[i];
         }
     }
 
-    return double_matrix;
-}
-
-
-
-// Function to generate a random system of linear equations
-std::pair<std::vector<std::vector<double>>, std::vector<double>> generateRandomEquations(int num_variables) {
-    std::vector<std::vector<double>> A(num_variables, std::vector<double>(num_variables));
-    std::vector<double> B = convertIntToDoubleVector(generateRandomVector(num_variables, -10.0*num_variables, 15.0*num_variables));
-
-    A = convertIntMatrixToDouble(generateRandomIntMatrix(num_variables,num_variables,-20,20));
-
-    return {A, B};
+    // Back substitution
+    vector<double> x(n);
+    for (int i = n - 1; i >= 0; i--) {
+        x[i] = B[i];
+        for (int j = i + 1; j < n; j++) {
+            x[i] -= A[i][j] * x[j];
+        }
+        x[i] /= A[i][i];
+    }
+    return x;
 }
 
 // Function to print the system of equations
-void printSystem(const std::vector<std::vector<double>>& A, const std::vector<double>& B) {
+void printSystem(vector<vector<double>>& A, vector<double>& B) {
     int n = A.size();
-    std::ostringstream equation;
-
+    cout << "System of equations:\n";
     for (int i = 0; i < n; ++i) {
         for (int j = 0; j < n; ++j) {
-            if (A[j][i] >= 0 && j > 0) {
-                equation << "+";
-            }
-            equation << A[j][i] << "x" << (j + 1) << " ";
+            if (A[i][j] >= 0 && j > 0) cout << "+";
+            cout << A[i][j] << "x" << (j + 1) << " ";
         }
-        equation << "= " << B[i] << std::endl;
+        cout << "= " << B[i] << endl;
     }
-
-    std::cout << "System of equations:\n";
-    std::cout << equation.str() << std::endl;
-}
-
-// Function to solve the system of linear equations using LAPACK
-std::vector<double> solveLinearSystem(std::vector<std::vector<double>>& A, std::vector<double>& B) {
-    int n = A.size(); // Number of variables
-    int nrhs = 1; // Number of right-hand sides (we have only one)
-    int lda = n;
-    int ldb = n;
-    int info;
-    std::vector<int> ipiv(n); // Pivot indices
-
-    // Convert the matrix A to a 1D array
-    std::vector<double> A_flat(n * n);
-    for (int i = 0; i < n; ++i) {
-        for (int j = 0; j < n; ++j) {
-            A_flat[i * n + j] = A[i][j];
-        }
-    }
-
-    // Call LAPACK to solve the system
-    dgesv_(&n, &nrhs, A_flat.data(), &lda, ipiv.data(), B.data(), &ldb, &info);
-
-    if (info != 0) {
-        throw std::runtime_error("Error: dgesv failed with info = " + std::to_string(info));
-    }
-
-    return B; // B now contains the solution
+    cout << endl;
 }
 
 int main() {
     int num_variables;
-    std::cout << "Enter the number of variables: ";
-    std::cin >> num_variables;
+    cout << "Enter the number of variables: ";
+    cin >> num_variables;
 
-    std::cout << "Do you want to input the system of equations manually? (y/n): ";
-    char choice;
-    std::cin >> choice;
-
-    std::vector<std::vector<double>> A;
-    std::vector<double> B;
-
-    if (choice == 'y' || choice == 'Y') {
-        A.resize(num_variables, std::vector<double>(num_variables));
-        B.resize(num_variables);
-        std::cout << "Enter the coefficients of the system of equations:" << std::endl;
-        for (int i = 0; i < num_variables; ++i) {
-            std::cout << "Equation " << (i + 1) << " (Enter coefficients for x1, x2,... x" << num_variables << " and constant term):" << std::endl;
-            for (int j = 0; j < num_variables; ++j) {
-                std::cin >> A[i][j];
-            }
-            std::cin >> B[i];
-        }
-    } else {
-        std::tie(A, B) = generateRandomEquations(num_variables);
+    // Generate random matrix A and vector B
+    vector<vector<double>> A = generateRandomIntMatrix(num_variables, num_variables, -10, 10);
+    vector<double> B(num_variables);
+    for (int i = 0; i < num_variables; i++) {
+        B[i] = generateRandomIntMatrix(1, 1, -10 * num_variables, 10 * num_variables)[0][0];
     }
 
+    cout<<"\033[31m";
+    cout<<"================================================================="<<endl;
     printSystem(A, B);
+    cout<<"================================================================="<<endl;
 
-    try {
-        std::vector<double> solution = solveLinearSystem(A, B);
+    vector<double> solution = gaussianElimination(A, B);
 
-        std::cout << "The solution to the system is:" << std::endl;
-        for (int i = 0; i < solution.size(); ++i) {
-            std::cout << "x" << (i + 1) << " = " << solution[i] << std::endl;
-        }
-    } catch (const std::exception& e) {
-        std::cerr << e.what() << std::endl;
+    cout << "\033[34m" << "Solution:\n------------\n"<<"\033[32m";
+    for (int i = 0; i < num_variables; i++) {
+        cout << "x" << (i + 1) << " = " << solution[i] << endl;
     }
-
-    std::cout<<"Press any key to exit";
-
-    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Ignore leftover input
-    std::cin.get();
+    cout <<"================================================================="<<endl;
+    cout << "\033[0m" << "Press any key to exit" << endl;
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    cin.get();
     return 0;
 }

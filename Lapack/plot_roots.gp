@@ -1,18 +1,12 @@
-set title "Roots of the equation:\nx^{ 9 }-9x^{ 8 }-10x^{ 7 }-5x^{ 6 }-4x^{ 5 }+8x^{ 4 }-x^{ 3 }-9x^{ 2 }+8x+6 = 0"
+set title "Roots of the equation:\n6x^{ 3 }-3x^{ 2 }-9x+4 = 0"
 set xlabel "Real"
 set ylabel "Imaginary"
 set grid
-set xrange [-1.61908:11.5527]
-set yrange [-1.8085:1.8085]
+set xrange [-1.82508:1.89508]
+set yrange [-0.5:0.5]
 plot '-' with points pt 7 ps 1.5 lc rgb 'red' title 'Roots'
-10.0479 0
-0.862198 0
-0.579002 0.678617
-0.579002 -0.678617
--0.541665 0
--0.245891 -1.18954
--1.01734 0.232372
--1.01734 -0.232372
--0.245891 1.18954
+1.26826 0
+0.436367 0
+-1.20462 0
 e
 pause -1

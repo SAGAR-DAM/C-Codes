@@ -282,3 +282,6 @@ int main()
     std::cin.get();
     return 0;
 }
+
+
+// run code with:  g++ -o .\linear_system_matrix_inverse.cpp "D:\C++ codes\My_C++_modules\np.cpp"  .\linear_system_matrix_inverse.cpp 
