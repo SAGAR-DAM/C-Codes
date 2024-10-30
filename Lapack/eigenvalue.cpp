@@ -37,41 +37,41 @@ vector<complex<double>> create_circ_root(int n)
 // Function to construct the polynomial string from coefficients
 std::string constructPolynomial(const std::vector<double>& coefficients) 
 {
-    std::ostringstream polynomial; // To hold the polynomial string
-    int n = coefficients.size(); // Degree of the polynomial
+    std::ostringstream polynomial;
+    int n = coefficients.size();
 
     for (int i = 0; i < n; ++i) {
         double coeff = coefficients[i];
-        int power = n - 1 - i; // Calculate the power
+        int power = n - 1 - i;
 
         // Skip zero coefficients
         if (coeff == 0) {
             continue;
         }
 
-        // Add the coefficient and variable part
-        if (polynomial.str().length() > 0) { // If not the first term
-            if (coeff > 0) {
-                polynomial << "+";
-            } else {
+        // Handle the sign for the first term or subsequent terms
+        if (polynomial.str().empty()) { // First term
+            if (coeff < 0) {
                 polynomial << "-";
             }
+        } else { // Subsequent terms
+            polynomial << (coeff > 0 ? "+" : "-");
         }
 
         // Handle the absolute value of the coefficient
         if (abs(coeff) != 1 || power == 0) {
-            polynomial << abs(coeff); // Only print coefficient if it's not ±1 or if it's constant
+            polynomial << abs(coeff);
         }
 
         // Handle the variable and power part
         if (power > 0) {
-            polynomial << "x"; // Add variable x
+            polynomial << "x";
             if (power > 1) {
-                polynomial << "^" << power; // Add power if it's greater than 1
+                polynomial << "^" << power;
             }
         }
     }
-    return polynomial.str(); // Return the constructed polynomial as a string
+    return polynomial.str();
 }
 
 
@@ -229,6 +229,7 @@ int main()
     cout<<endl;
     
     Matrix A = getRandomIntMatrix(size,size,-10,10);
+    std::cout << "\033[31m"; // Set text color to red
     cout<<"========================================================================================================================"<<endl;
     cout<<"The Matrix:"<<endl<<"-------------"<<endl<<A<<endl<<endl;
     cout<<"========================================================================================================================"<<endl<<endl;
@@ -245,13 +246,25 @@ int main()
 
     try 
     {
-        vector<complex<double>> seeds = create_circ_root(size*size);
+        int seed_number = 125;
+        if(seed_number>5)
+        {
+            seed_number=size*size*size;
+        }
+        
+        vector<complex<double>> seeds = create_circ_root(seed_number);
         std::vector<std::complex<double>> roots; // Vector to store the final roots
+        int max_iteration=1000;
+        if(size>10)
+        {
+            max_iteration = size*size*size;
+        }
+
         int counter = 0;
         // Loop over each seed to find a root using predictRoot
         for (const auto& seed : seeds) 
         {
-            std::complex<double> root = predictRoot(coefficients, seed, 1e-10, size*size*size); // tolerance = 1e-6, maxIterations = 100
+            std::complex<double> root = predictRoot(coefficients, seed, 1e-10, max_iteration); // tolerance = 1e-6, maxIterations = 100
             if(abs(evalpolynomial(coefficients,root))<0.1)
             {
                 roots.push_back(root);
@@ -260,6 +273,7 @@ int main()
             if(removeCloseDuplicates(roots).size()==size)
             {   
                 cout<<"Loop run counter: "<<counter<<endl<<endl;
+                std::cout << "\033[32m"; // Set text color to green
                 cout<<"========================================================================================================================"<<endl<<endl;
                 break;
             }
@@ -275,11 +289,15 @@ int main()
             double error = std::abs(evalpolynomial(coefficients, root));  // Example error calculation
 
             // Print the root index, root value, and error, all justified
-            std::cout << std::left << "Root " << i + 1 << ": " 
+            std::cout << "\033[34m" << std::left << "Root " << i + 1 << ": " << "\033[32m"
                     << std::setw(1) << std::fixed << std::setprecision(8) << "(" << root.real() << ", " << root.imag() << ")"
-                    << "\twith Error Charac_poly(x) ~ " << std::scientific << std::setprecision(2) << error << "\n";
+                    << "\033[33m" << "\twith Error Charac_Poly(x) ~ " << std::scientific << std::setprecision(2) << error << "\n";
         }
         
+        cout<<"\033[32m"<<"========================================================================================================================"<<endl;
+        // Reset the color back to default
+        std::cout << "\033[0m";
+
         // Create Gnuplot script to plot the unique roots
         createGnuplotScript(polynomial, uniqueRoots);
 
