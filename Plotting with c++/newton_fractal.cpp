@@ -12,9 +12,9 @@ using namespace std;
 using namespace chrono;
 
 
-const int ITERATION = 70;
+const int ITERATION = 50;
 const int RES = 350;
-const int rootnumber = 7;
+const int rootnumber = 4;
 
 // Function to create random roots
 vector<complex<double>> create_random_root(int n) 
@@ -91,7 +91,7 @@ int main() {
     auto t_start = high_resolution_clock::now();
 
     // Generate random roots
-    //vector<complex<double>> root = create_random_root(rootnumber)
+    // vector<complex<double>> root = create_random_root(rootnumber);
     vector<complex<double>> root = create_random_root(rootnumber);
     // vector<complex<double>> root = create_circ_root(rootnumber);
 
@@ -186,7 +186,7 @@ int main() {
     ofstream dataFile1("roots.txt");
     for (int i = 0; i < rootnumber; i++)
     {
-        dataFile1 << real(root[i]) << " " << imag(root[i]) << 1 << "\n";      
+        dataFile1 << real(root[i]) << " " << imag(root[i]) << " " << 1 << "\n";      
     }
     dataFile1 << "\n";
     dataFile1.close();
