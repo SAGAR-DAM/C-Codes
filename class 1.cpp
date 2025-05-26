@@ -1,84 +1,56 @@
-#include<iostream>
-#include<iomanip>
-#include<string>
-
+#include <iostream>
+#include <string>
 using namespace std;
 
-class employee
-{
-    public:
-        string name, eid;
-        int age;
-        char post;
 
-    private:
-        float base_salary, increament;
-        float current_salary;
-
-    public:
-        void get_public_info();
-        void get_private_info();
-        void make_salary();
+// Struct that will hold the parameters
+struct EmployeeParams {
+    string name = "Unknown";
+    int age = 0;
+    float salary = 0.0f;
+    char post = 'd';
 };
 
-void employee :: get_public_info()
-{
-    cout<<"Enter name: ";
-    cin>>name;
-    cout<<"Enter eid: ";
-    cin>>eid;
-    cout<<"Enter age: ";
-    cin>>age;
-    cout<<"Enter post: ";
-    cin>>post;
-    cout<<endl;
-}
 
-void employee :: get_private_info()
-{
-    cout<<"Enter the base salary: ";
-    cin>>base_salary;
-    cout<<endl;
+class Employee {
+public:
+    string name;
+    int age;
+    float salary;
+    char post;
 
-    switch(post)
-    {
-        case 'a':
-            increament=5;
-            break;
-        case 'b':
-            increament=10;
-            break;
-        case 'c':
-            increament=15;
-            break;
-        case 'd':
-            increament=20;
-            break;
-        case 'e':
-            increament=25;
-            break;
-        case 'f':
-            increament=30;
-            break;
-        default:
-            increament=0;
-            break;
-
+    // Constructor that takes a struct with all parameters
+    Employee(struct EmployeeParams params) {
+        name = params.name;
+        age = params.age;
+        salary = params.salary;
+        post = params.post;
     }
-    cout<<endl<<"for post: "<<post<<" increament is: "<<increament<<endl;
-}
 
-void employee :: make_salary()
-{
-    current_salary = base_salary*(1+increament/100);
-    cout<<"final salary of "<<name<<" is: "<<current_salary<<endl;
-}
+    void display() {
+        cout << "Name: " << name << ", Age: " << age << ", Salary: " << salary << ", Post: " << post << endl;
+    }
+};
 
-int main()
-{
-    employee sagar;
-    sagar.get_public_info();
-    sagar.get_private_info();
-    sagar.make_salary();
-    return(0);
+
+int main() {
+    // You can now pass only the parameters you care about
+    EmployeeParams params1;
+    params1.name = "Alice";  // Specify only the name
+    Employee e1(params1);
+
+    EmployeeParams params2;
+    params2.age = 28;  // Specify only the age
+    Employee e2(params2);
+
+    EmployeeParams params3;
+    params3.salary = 60000.0f;  // Specify only the salary
+    params3.name = "Sagar";
+    Employee e3(params3);
+
+    e1.display();
+    e2.display();
+    e3.display();
+
+    return 0;
 }

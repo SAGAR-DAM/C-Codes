@@ -13,8 +13,10 @@ Complex f(Complex c)
     // z = complex::addcomplex(z,c);
     // z = complex::addcomplex(z,complex(-1,0));
     // z = complex::addcomplex(z,complex::divcomplex(complex(1,0),c));
+    Complex z(1,1);
 
-    Complex z = Complex::logcomplex(Complex::sincomplex(c));
+    z = Complex::logcomplex(Complex::sincomplex(c));
+    // z = Complex::complexpow(c,c);
 
     return z;
 }
@@ -37,7 +39,8 @@ int main() {
             double y = yMin + j * y_step;
             Complex c = Complex(x,y);
             Complex z = f(c);
-            double z_r = z.get_r();//Complex::abscomplex(z);
+            double z_r = z.get_r();
+            // double z_r = z.get_theta();
             dataFile << x << " " << y << " " << z_r << "\n";
         }
         dataFile << "\n";

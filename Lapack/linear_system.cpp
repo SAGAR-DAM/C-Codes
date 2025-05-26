@@ -121,3 +121,6 @@ int main() {
     cin.get();
     return 0;
 }
+
+
+// run with:  g++ -o linear_system .\linear_system.cpp

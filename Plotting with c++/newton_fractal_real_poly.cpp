@@ -6,18 +6,20 @@
 #include <fstream>
 #include <cstdlib>
 #include <cstdio>
-#include "D:\C++ codes\My_C++_modules\np.hpp"
+// #include "D:\C++ codes\My_C++_modules\np.hpp"
 #include <limits>  
 #include <stdexcept>
 #include <regex>
 #include <iomanip>
-#include <chrono>   // to create new random numbers each time. Visit: https://chatgpt.com/share/6700cacc-8640-8013-bc41-94054ab0dc0b
+#include <chrono>   
+
+// to create new random numbers each time. Visit: https://chatgpt.com/share/6700cacc-8640-8013-bc41-94054ab0dc0b
 
 using namespace std;
 
 
 const int ITERATION = 50;
-const int RES = 700;
+const int RES = 100;
 
 
 // Function to generate a random double vector of a given size and range
@@ -334,6 +336,7 @@ int main()
         y[i] = -maxReal + (2 * maxReal / (y.size() - 1)) * i;
     }
 
+    
     vector<complex<double>> z(x.size() * y.size());
     for (int i = 0; i < x.size(); i++) 
     {
@@ -343,6 +346,10 @@ int main()
         }
     }
 
+    float progress;
+    int print_after = 10;  // Define the interval percentage for progress update
+    int total_iterations = ITERATION;
+    int interval = (print_after * total_iterations) / 100;
 
     for (int i = 0; i < ITERATION; i++) 
     {
@@ -350,7 +357,14 @@ int main()
         {
             z[j] = iteration_step(z[j], uniqueRoots);
         }
+        // Print progress at each `print_after` percent interval
+        if (i % interval == 0) 
+        {
+            progress = 100.0 * i / (ITERATION - 0);
+            cout << "Progress: " << fixed << setprecision(0) << progress << "%" << endl;
+        }
     }
+    cout << "Progress: " << "100%" << endl;
 
     vector<int> f_values(z.size());
     for (size_t i = 0; i < z.size(); i++) 

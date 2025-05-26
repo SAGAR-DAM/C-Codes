@@ -11,10 +11,17 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "type": "java",
+            "name": "PrimeNumbers",
+            "request": "launch",
+            "mainClass": "PrimeNumbers",
+            "projectName": "C++ codes_25e050"
+        },
+        {
             "name": "Run C++ program",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${fileDirname}/${fileBasenameNoExtension}.exe", // Executable
+            "program": "${fileDirname}/${fileBasenameNoExtension}.exe",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
@@ -28,10 +35,10 @@
                     "ignoreFailures": true
                 }
             ],
-            "preLaunchTask": "Run Executable", // Run the task before launching
-            "miDebuggerPath": "/usr/bin/gdb",  // Adjust this if needed
+            "preLaunchTask": "Run Executable",
+            "miDebuggerPath": "/usr/bin/gdb",
             "internalConsoleOptions": "neverOpen",
-            "console": "integratedTerminal"    // Use the VSCode terminal
+            "console": "integratedTerminal"
         }
     ]
 }

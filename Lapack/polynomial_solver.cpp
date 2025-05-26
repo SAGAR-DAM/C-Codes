@@ -283,7 +283,7 @@ int main()
     // int size = coefficients.size()-1;
 
     int size;
-    cout<<"Enter size: ";
+    cout<<"\033[34m"<<"Enter order of equation: ";
     cin>>size;
    
 
@@ -337,11 +337,11 @@ int main()
                 cout<<"Loop run counter: "<<counter<<endl<<endl;
                 // Enable green color for the output
                 std::cout << "\033[32m"; // Set text color to green
-                cout<<"========================================================================================================================"<<endl<<endl;
+                cout<<"========================================================================================================================"<<endl;
                 break;
             }
         }
-
+        cout<< "Roots of the polynomial equation:\n---------------------------------"<<endl<<endl;
         // Remove duplicates within a certain tolerance
         std::vector<std::complex<double>> uniqueRoots = removeCloseDuplicates(roots);
 

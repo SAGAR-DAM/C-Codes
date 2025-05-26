@@ -255,33 +255,38 @@ int main()
     Matrix A = randomSystem.first;  // Coefficient matrix
     Matrix B = randomSystem.second; // Constants matrix (as a column vector)
 
+    cout<<"\033[31m";
+    cout<<"================================================================="<<endl;
     printSystem(A,B);
+    cout<<"================================================================="<<endl;
 
     Matrix inv_A = A.inverse();
 
     Matrix sol = Matrix::multiply(inv_A,B);
 
+    cout << "\033[32m" << "Solution:\n------------\n"<<"\033[32m";
     for(int i=0;i<num_variables;++i)
     {
         cout<<"x"<<(i+1)<<" = "<<sol[i][0]<<endl;
     }
 
+    cout<<"================================================================="<<endl<<"\033[34m";
     Matrix cross_varify = Matrix::subtract(Matrix::multiply(A,sol),B).transpose();
     double error_range=0;
     for(int i=0; i<num_variables; ++i)
     {
-        error_range = error_range + abs(cross_varify[0][i]);
+        error_range = error_range + pow(abs(cross_varify[0][i]),2);
     }
     setSmallValuesToZero(cross_varify, 1e-8); // Call the function to set small values to zero
 
-    cout<<endl<<"cross_varify: A.sol = "<<"("<<cross_varify<<")"<<endl;
-    cout<<"With error level: "<<error_range/num_variables<<endl;
+    cout<<endl<<"cross_varify: A.sol-B = "<<"("<<cross_varify<<")"<<endl;
+    cout<<"With error level:  |A.X-B| ~ " << pow(error_range,0.5) << endl;
 
-    std::cout<<"Press any key to exit"<<endl;
+    std::cout<<"Press any key to exit"<<"\033[0m"<<endl;
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Ignore leftover input
     std::cin.get();
     return 0;
 }
 
 
-// run code with:  g++ -o .\linear_system_matrix_inverse.cpp "D:\C++ codes\My_C++_modules\np.cpp"  .\linear_system_matrix_inverse.cpp 
+// run code with:  g++ -o .\linear_system_matrix_inverse "D:\C++ codes\My_C++_modules\np.cpp"  .\linear_system_matrix_inverse.cpp 
