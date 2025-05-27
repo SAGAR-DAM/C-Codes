@@ -45,9 +45,15 @@ struct function_param
 };
 
 
-double function(function_param fp=function_param())
+double function(function_param fp)
 {
     double val = (fp.p.x + fp.p.y) * fp.n + fp.a + fp.b;
+    return val;
+}
+
+double function(Point p=Point(), int n=0, int a=0, int b=0)
+{
+    double val = (p.x + p.y) * n + a + b;
     return val;
 }
 
@@ -59,7 +65,10 @@ int main()
     cout << "p.x: " << p.x << "; p.y: " << p.y << endl;
     cout << "q.x: " << q.x << "; q.y: " << q.y << endl;
 
-    cout<<"function val:  "<<function(function_param::__init__{.p=p,.n=1}.__build__())<<endl;
-    cout<<"default function val: "<<function()<<endl;
+    cout<<"function val:  "<<function(function_param::__init__{.p=q,.n=1}.__build__())<<endl;
+    cout<<"default function with struct val: "<<function(Point())<<endl;
+    cout<<"function with parameters val: "<<function(q,2,0,1)<<endl;
+    cout<<"default function with parameters val: "<<function();
     return 0;
 }
+
