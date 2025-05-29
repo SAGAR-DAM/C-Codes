@@ -107,6 +107,18 @@ class complex
             return c_div;
         }
 
+        static complex complex_exponenciation(complex c, float n)
+        {
+            c.rect_to_polar();
+            double r_exp = pow(c.r,n);
+            float theta_exp = n*c.theta;
+
+            double real_exp = r_exp*cos(theta_exp), imag_exp = r_exp*sin(theta_exp);
+            complex c_exp = complex(real_exp, imag_exp);
+            c_exp.rect_to_polar();
+            return c_exp;
+        }
+
         static complex complexpow(complex c1, complex c2)
         {
             c1.rect_to_polar();
