@@ -570,7 +570,7 @@ int main()
     double low_energy=100;
     double high_energy=20100;
     double steep = 2;
-    double no_of_particle = 200;
+    double no_of_particle = 50;
     double t_res = 50000;
 
     std::vector<double> energy_array = generate_scaled_energy(low_energy, high_energy, no_of_particle, steep);
