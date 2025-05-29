@@ -1,3 +1,10 @@
+// # -*- coding: utf-8 -*-
+// """
+// Created on Thu May 29 19:40:44 2025
+
+// @author: mrsag
+// """
+
 #include "C:\\Users\\mrsag\\AppData\\Local\\Programs\\Python\\Python311\\include\\Python.h"
 #include <iostream>
 #include <string>
