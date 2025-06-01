@@ -16,8 +16,18 @@
 #include <iomanip>
 #include <limits>
 
-
 using namespace std;
+
+
+/*
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+                                    CONSTANTS AND UNIT CONVERSION
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+*/
 
 double cm = 1e-2;
 double mm = 1e-3;
@@ -41,6 +51,18 @@ double lE = 12 * cm;            // Electric field length (lE)  (in cm)
 double lB = 5 * cm;             // Magnetic field length (lB)  (in cm)
 double DE = 18.8 * cm;          // Distance of screen from electric field region endpoint (DE)  (in cm)
 double DB = (32.3 + 1.75) * cm; // Distance of screen from magnetic field region endpoint (DB)  (in cm)
+
+
+
+/*
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+                                    SIMULATION CLASSES AND HELPER FUNCTIONS
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+*/
 
 struct Particle
 {
@@ -174,7 +196,6 @@ struct Particle
     }
 };
 
-
 struct Proton : public Particle
 {
     Proton(double x = 0.0,
@@ -187,7 +208,6 @@ struct Proton : public Particle
     {
     }
 };
-
 
 struct C1 : public Particle
 {
@@ -202,7 +222,6 @@ struct C1 : public Particle
     }
 };
 
-
 struct C2 : public Particle
 {
     C2(double x = 0.0,
@@ -215,7 +234,6 @@ struct C2 : public Particle
     {
     }
 };
-
 
 struct C3 : public Particle
 {
@@ -230,7 +248,6 @@ struct C3 : public Particle
     }
 };
 
-
 struct C4 : public Particle
 {
     C4(double x = 0.0,
@@ -243,7 +260,6 @@ struct C4 : public Particle
     {
     }
 };
-
 
 struct C5 : public Particle
 {
@@ -258,7 +274,6 @@ struct C5 : public Particle
     }
 };
 
-
 struct C6 : public Particle
 {
     C6(double x = 0.0,
@@ -272,14 +287,12 @@ struct C6 : public Particle
     }
 };
 
-
 struct O1 : public Particle
 {
     O1(double x = 0.0, double y = 0.0, double z = 0.0,
        double vx = 0.0, double vy = 0.0, double vz = 0.0)
         : Particle(x, y, z, vx, vy, vz, 1 * qe, 16 * mH) {}
 };
-
 
 struct O2 : public Particle
 {
@@ -288,14 +301,12 @@ struct O2 : public Particle
         : Particle(x, y, z, vx, vy, vz, 2 * qe, 16 * mH) {}
 };
 
-
 struct O3 : public Particle
 {
     O3(double x = 0.0, double y = 0.0, double z = 0.0,
        double vx = 0.0, double vy = 0.0, double vz = 0.0)
         : Particle(x, y, z, vx, vy, vz, 3 * qe, 16 * mH) {}
 };
-
 
 struct O4 : public Particle
 {
@@ -304,14 +315,12 @@ struct O4 : public Particle
         : Particle(x, y, z, vx, vy, vz, 4 * qe, 16 * mH) {}
 };
 
-
 struct O5 : public Particle
 {
     O5(double x = 0.0, double y = 0.0, double z = 0.0,
        double vx = 0.0, double vy = 0.0, double vz = 0.0)
         : Particle(x, y, z, vx, vy, vz, 5 * qe, 16 * mH) {}
 };
-
 
 struct O6 : public Particle
 {
@@ -320,7 +329,6 @@ struct O6 : public Particle
         : Particle(x, y, z, vx, vy, vz, 6 * qe, 16 * mH) {}
 };
 
-
 struct O7 : public Particle
 {
     O7(double x = 0.0, double y = 0.0, double z = 0.0,
@@ -328,14 +336,12 @@ struct O7 : public Particle
         : Particle(x, y, z, vx, vy, vz, 7 * qe, 16 * mH) {}
 };
 
-
 struct O8 : public Particle
 {
     O8(double x = 0.0, double y = 0.0, double z = 0.0,
        double vx = 0.0, double vy = 0.0, double vz = 0.0)
         : Particle(x, y, z, vx, vy, vz, 8 * qe, 16 * mH) {}
 };
-
 
 void print_1d_vector(const std::vector<double> &v)
 {
@@ -345,7 +351,6 @@ void print_1d_vector(const std::vector<double> &v)
     }
     std::cout << std::endl;
 }
-
 
 std::vector<double> linspace(double start, double end, int num)
 {
@@ -358,7 +363,6 @@ std::vector<double> linspace(double start, double end, int num)
     return result;
 }
 
-
 std::pair<double, double> solve2x2(double a11, double a12, double a21, double a22, double b1, double b2)
 {
     double det = a11 * a22 - a12 * a21;
@@ -370,7 +374,6 @@ std::pair<double, double> solve2x2(double a11, double a12, double a21, double a2
 
     return {alpha, beta};
 }
-
 
 std::vector<double> generate_scaled_energy(double low_energy, double high_energy, int no_of_particles, double steep)
 {
@@ -397,31 +400,109 @@ std::vector<double> generate_scaled_energy(double low_energy, double high_energy
     return Energy;
 }
 
+/*
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// Converts one vector and injects it into the __main__ module under a given name
-void convert_and_inject_vector(const std::vector<double> &vec, const char *name)
+                                    CONVERSION OF CPP OBJECT TO PYTHON OBJECT
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+*/
+// ---------- Convert C++ Value to PyObject ----------
+template <typename T>
+PyObject *cpp_value_to_pyobject(const T &value)
+{
+    if constexpr (std::is_same_v<T, int>)
+        return PyLong_FromLong(value);
+    else if constexpr (std::is_same_v<T, double>)
+        return PyFloat_FromDouble(value);
+    else if constexpr (std::is_same_v<T, float>)
+        return PyFloat_FromDouble(static_cast<double>(value));
+    else if constexpr (std::is_same_v<T, std::string>)
+        return PyUnicode_FromString(value.c_str());
+    else if constexpr (std::is_same_v<T, const char *>)
+        return PyUnicode_FromString(value);
+    else if constexpr (std::is_same_v<T, char *>)
+        return PyUnicode_FromString(value);
+
+    else if constexpr (std::is_same_v<T, char>)
+        return PyUnicode_FromStringAndSize(&value, 1);
+    else if constexpr (std::is_same_v<T, bool>)
+        return PyBool_FromLong(value);
+    else
+    {
+        static_assert(!std::is_same_v<T, T>, "Unsupported type for Python conversion.");
+        return nullptr;
+    }
+}
+
+/*
+    CONVERSION OF SINGLE VARIABLE LIKE int, bool, char, double, string, ... etc
+*/
+// ---------- Inject Single Variable ----------
+template <typename T>
+void convert_and_inject_variable(const T &value, const char *name)
+{
+    PyObject *pyVal = cpp_value_to_pyobject(value);
+    if (!pyVal)
+        throw std::runtime_error("Failed to convert C++ value to Python object.");
+
+    PyObject *mainModule = PyImport_AddModule("__main__");
+    PyObject *mainDict = PyModule_GetDict(mainModule);
+    PyDict_SetItemString(mainDict, name, pyVal);
+    Py_DECREF(pyVal);
+}
+
+// ---------- Tuple Expansion ----------
+template <typename TupleVars, typename TupleNames, std::size_t... Is>
+void convert_and_inject_variables_impl(const TupleVars &vars, const TupleNames &names, std::index_sequence<Is...>)
+{
+    (convert_and_inject_variable(std::get<Is>(vars), std::get<Is>(names)), ...);
+}
+
+template <typename... Vars, typename... Names>
+void convert_and_inject_variables(const std::tuple<Vars...> &vars, const std::tuple<Names...> &names)
+{
+    static_assert(sizeof...(Vars) == sizeof...(Names), "Mismatched number of variables and names.");
+    convert_and_inject_variables_impl(vars, names, std::index_sequence_for<Vars...>{});
+}
+
+/*
+    CONVERSION OF 1D VECTORS LIKE
+    {1,2,6,4} -> [1,2,6,4]
+    {1.5,-5.6,3e10} -> [1.5,-5.6,3e10]
+    {TRUE, FALSE, FALSE,... } ->  [TRUE, FALSE, FALSE,... ]
+*/
+// ---------- Convert & Inject Vector ----------
+template <typename T>
+void convert_and_inject_vector(const std::vector<T> &vec, const char *name)
 {
     PyObject *pyList = PyList_New(vec.size());
     for (size_t i = 0; i < vec.size(); ++i)
     {
-        PyList_SetItem(pyList, i, PyFloat_FromDouble(vec[i]));
+        PyObject *item = cpp_value_to_pyobject(vec[i]);
+        if (!item)
+        {
+            Py_DECREF(pyList);
+            throw std::runtime_error("Failed to convert C++ type to Python object.");
+        }
+        PyList_SetItem(pyList, i, item); // Steals reference
     }
 
     PyObject *mainModule = PyImport_AddModule("__main__");
     PyObject *mainDict = PyModule_GetDict(mainModule);
     PyDict_SetItemString(mainDict, name, pyList);
-
-    Py_DECREF(pyList);
+    Py_DECREF(pyList); // PyDict_SetItemString does not steal
 }
 
-// Helper function to expand vector-name pairs by index
+// ---------- Tuple Expansion ----------
 template <typename TupleVecs, typename TupleNames, std::size_t... Is>
 void convert_and_inject_vectors_impl(const TupleVecs &vecs, const TupleNames &names, std::index_sequence<Is...>)
 {
     (convert_and_inject_vector(std::get<Is>(vecs), std::get<Is>(names)), ...);
 }
 
-// Main function: accepts tuples of vectors and names
 template <typename... Vectors, typename... Names>
 void convert_and_inject_vectors(const std::tuple<Vectors...> &vecs, const std::tuple<Names...> &names)
 {
@@ -429,16 +510,120 @@ void convert_and_inject_vectors(const std::tuple<Vectors...> &vecs, const std::t
     convert_and_inject_vectors_impl(vecs, names, std::index_sequence_for<Vectors...>{});
 }
 
+/*
+    CONVERSION OF MULTIDIMENSIONAL VECTORS TO PYTHON ARRAY LIKE
+    {{{1.1, 1.2}, {1.3, 1.4}}, {{2.1, 2.2}, {2.3, 2.4}}} -> [[[1.1 1.2],[1.3 1.4]],   [[2.1 2.2], [2.3 2.4]]]
+    {{{true, false}, {false, true}}, {{true, true}, {false, false}}} ->  [[[True, False], [False, True]], [[True, True], [False, False]]]
+*/
+// Type trait to check if T is a std::vector
+template <typename T>
+struct is_std_vector : std::false_type
+{
+};
 
+template <typename T, typename Alloc>
+struct is_std_vector<std::vector<T, Alloc>> : std::true_type
+{
+};
 
+template <typename T>
+PyObject *cpp_tensorvalue_to_pyobject(const T &value)
+{
+    if constexpr (is_std_vector<T>::value)
+    {
+        PyObject *list = PyList_New(value.size());
+        for (size_t i = 0; i < value.size(); ++i)
+        {
+            PyObject *item = cpp_value_to_pyobject(value[i]); // Recursive call
+            PyList_SetItem(list, i, item);
+        }
+        return list;
+    }
+    else
+    {
+        // Scalar conversion
+        if constexpr (std::is_same_v<T, int>)
+            return PyLong_FromLong(value);
+        else if constexpr (std::is_same_v<T, double>)
+            return PyFloat_FromDouble(value);
+        else if constexpr (std::is_same_v<T, bool>)
+            return PyBool_FromLong(value);
+        else if constexpr (std::is_same_v<T, const char *>)
+            return PyUnicode_FromString(value);
+        else if constexpr (std::is_same_v<T, std::string>)
+            return PyUnicode_FromString(value.c_str());
+        else
+            static_assert(!sizeof(T), "Unsupported type for Python conversion");
+    }
+}
 
+// Recursive converter
+template <typename T>
+PyObject *cpp_tensor_to_pyobject(const T &value)
+{
+    if constexpr (is_std_vector<T>::value)
+    {
+        PyObject *list = PyList_New(value.size());
+        for (size_t i = 0; i < value.size(); ++i)
+        {
+            PyObject *item = cpp_tensor_to_pyobject(value[i]);
+            if (!item)
+            {
+                Py_DECREF(list);
+                throw std::runtime_error("Failed to convert nested vector.");
+            }
+            PyList_SetItem(list, i, item); // Steals reference
+        }
+        return list;
+    }
+    else
+    {
+        return cpp_tensorvalue_to_pyobject(value); // base case
+    }
+}
 
+// Inject into Python
+template <typename T>
+void convert_and_inject_tensor(const T &tensor, const char *name)
+{
+    PyObject *pyTensor = cpp_tensor_to_pyobject(tensor);
+    if (!pyTensor)
+        throw std::runtime_error("Conversion failed.");
+
+    PyObject *mainModule = PyImport_AddModule("__main__");
+    PyObject *mainDict = PyModule_GetDict(mainModule);
+    PyDict_SetItemString(mainDict, name, pyTensor);
+    Py_DECREF(pyTensor);
+}
+
+// Tuple support
+template <typename TupleTensors, typename TupleNames, std::size_t... Is>
+void convert_and_inject_tensors_impl(const TupleTensors &tensors, const TupleNames &names, std::index_sequence<Is...>)
+{
+    (convert_and_inject_tensor(std::get<Is>(tensors), std::get<Is>(names)), ...);
+}
+
+template <typename... Tensors, typename... Names>
+void convert_and_inject_tensors(const std::tuple<Tensors...> &tensors, const std::tuple<Names...> &names)
+{
+    static_assert(sizeof...(Tensors) == sizeof...(Names), "Mismatch in tensors and names.");
+    convert_and_inject_tensors_impl(tensors, names, std::index_sequence_for<Tensors...>{});
+}
+
+/*
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+                                        MAIN FUNCTION
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
+*/
 
 int main()
 {
     Py_Initialize();
-    PyRun_SimpleString("import matplotlib.pyplot as plt\nimport numpy as np");
-
+    PyRun_SimpleString("import matplotlib.pyplot as plt\nimport numpy as np\nindex=0");
 
     std::vector<std::string> particle_names = {"proton", "C1", "C2", "C3", "C4", "C5", "C6", "O1", "O2", "O3", "O4", "O5", "O6", "O7", "O8"};
     std::vector<double> low_energy_array = {1200, 8000, 8000, 8000, 8000, 8000, 8000, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 10000};
@@ -450,13 +635,15 @@ int main()
     double t_res = 10000;
 
     std::vector<double> posx, posy;
+    convert_and_inject_vectors(std::make_tuple(particle_names),
+                               std::make_tuple("particle_names"));
 
     double progress = 0;
 
     for (int i = 0; i < particle_names.size(); i++)
     {
-        posx={};
-        posy={};
+        posx = {};
+        posy = {};
         std::vector<double> energy_array = generate_scaled_energy(low_energy_array[i], high_energy_array[i], no_of_particle, steep);
         for (int j = 0; j < energy_array.size(); j++)
         {
@@ -477,23 +664,25 @@ int main()
             progress++;
         }
 
-        convert_and_inject_vectors(std::make_tuple(posx,posy),
-                                   std::make_tuple("x","y"));
+        convert_and_inject_vectors(std::make_tuple(posx, posy),
+                                   std::make_tuple("x", "y"));
 
-        const char* pyCode = R"(
-plt.plot(y, x)
+        const char *pyCode = R"(
+plt.plot(y, x, label=f"{particle_names[index]}")
+index += 1
         )";
         PyRun_SimpleString(pyCode);
     }
-    
+
     cout << "progress: " << 100 << " %" << endl;
 
-    const char* pyCode1 = R"(
+    const char *pyCode1 = R"(
 plt.grid(True)
 plt.plot([0],[0],"ko",markersize=5)
+plt.legend()
 plt.gca().set_aspect('equal')
 plt.show()
-        )";    
+        )";
 
     PyRun_SimpleString(pyCode1);
 
