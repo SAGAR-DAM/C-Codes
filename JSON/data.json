@@ -1,0 +1,9 @@
+{
+  "name": "Sagar Dam",
+  "age": 28,
+  "skills": ["C++", "Python", "High-Power Lasers"],
+  "details": {
+    "institution": "TIFR",
+    "project": "Laser-Plasma Interaction"
+  }
+}

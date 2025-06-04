@@ -26,9 +26,13 @@ to a temporary python __main__ for easier visualization. The python package Maya
 #include <cmath>
 #include <string>
 #include <iostream>
+#include <fstream>
 #include <algorithm>
+#include "json.hpp"
+
 #include "C:\\Users\\mrsag\\AppData\\Local\\Programs\\Python\\Python311\\include\\Python.h"
 
+using json = nlohmann::json;
 using namespace std;
 
 double Bx = 0;
@@ -899,73 +903,69 @@ std::vector<double> generate_scaled_energy(double low_energy, double high_energy
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 */
+int main() {
+    try {
+        // Use a hardcoded configuration file path
+        std::string configPath = "config.json"; // Default file in the same directory
+        std::ifstream configFile(configPath);
+        if (!configFile.is_open()) {
+            std::cerr << "Failed to open config file: " << configPath << std::endl;
+            return 1;
+        }
 
-int main()
-{
-    // Define grid size and physical size
-    int nx = 200, ny = 100, nz = 100;
-    double lx = 2.0 * cm, ly = 1.0 * cm, lz = 1.0 * cm;
+        json config;
+        configFile >> config;
 
-    SimulationBox3D box(nx, ny, nz, lx, ly, lz);
+        // Extract simulation box parameters
+        auto simBox = config["simulation_box"];
+        int nx = simBox["nx"], ny = simBox["ny"], nz = simBox["nz"];
+        double lx = simBox["lx"], ly = simBox["ly"], lz = simBox["lz"];
+        SimulationBox3D box(nx, ny, nz, lx, ly, lz);
 
-    // Add a sphere in the center at 1V
-    // box.addSphere(0.5, 0.5, 0.5, 0.1, 1.0);
+        // Add electrodes
+        for (const auto& electrode : config["electrodes"]) {
+            std::string type = electrode["type"];
+            if (type == "Sphere") {
+                box.addSphere(
+                    electrode["cx"], electrode["cy"], electrode["cz"],
+                    electrode["radius"], electrode["potential"]
+                );
+            } else if (type == "Box") {
+                box.addBox(
+                    electrode["x0"], electrode["y0"], electrode["z0"],
+                    electrode["x1"], electrode["y1"], electrode["z1"],
+                    electrode["potential"]
+                );
+            } else if (type == "Cylinder") {
+                box.addCylinder(
+                    electrode["cx"], electrode["cy"], electrode["cz"],
+                    electrode["radius"], electrode["height"],
+                    electrode["axis"].get<std::string>()[0],
+                    electrode["potential"]
+                );
+            } else {
+                throw std::runtime_error("Unknown electrode type: " + type);
+            }
+        }
 
-    // Add a box at a lower corner at -1V
-    // box.addBox(0.1, 0.1, 0.1, 0.2, 0.2, 0.2, -1.0);
+        // Run simulation
+        std::string method = config["method"];
+        int max_iter = config["max_iter"];
+        double tol = max_AbsoluteValue_doubel_vector(box.geometry) * 0.001;
+        box.solve(max_iter, tol, method);
 
-    // box.addPlane(0, 0, 1, -0.3 * cm, 0.03 * cm, 2000);
-    // box.addPlane(0, 0, 1, -0.7 * cm, 0.03 * cm, 2000);
+        // Initialize Python and visualize
+        Py_Initialize();
+        PyRun_SimpleString("from mayavi import mlab\nimport numpy as np");
 
-    // box.addCylinder(0 * cm, 0.3 * cm, 0.3 * cm, 0.05 * cm, 2 * cm, 'x', 5000);
-    // box.addCylinder(0 * cm, 0.7 * cm, 0.3 * cm, 0.05 * cm, 2 * cm, 'x', -5000);
-    // box.addCylinder(0 * cm, 0.3 * cm, 0.7 * cm, 0.05 * cm, 2 * cm, 'x', -5000);
-    // box.addCylinder(0 * cm, 0.7 * cm, 0.7 * cm, 0.05 * cm, 2 * cm, 'x', 5000);
-    // box.addCylinder(0 * cm, 0.5 * cm, 0.1 * cm, 0.05 * cm, 2 * cm, 'x', 5000);
-    // box.addCylinder(0 * cm, 0.5 * cm, 0.9 * cm, 0.05 * cm, 2 * cm, 'x', -5000);
-    // box.addCylinder(0 * cm, 0.1 * cm, 0.5 * cm, 0.05 * cm, 2 * cm, 'x', 5000);
-    // box.addCylinder(0 * cm, 0.9 * cm, 0.5 * cm, 0.05 * cm, 2 * cm, 'x', -5000);
-    // Solve the Laplace equation
-    double tol = max_AbsoluteValue_doubel_vector(box.geometry)*0.001;
-    box.solve(5000, tol, "gauss-seidel");
+        convert_and_inject_vectors(std::make_tuple(box.potential),
+                                  std::make_tuple("box_potential"));
 
-    // Check potential at center
-    int i = nx / 2, j = ny / 2, k = nz / 2;
-    double center_potential = box.getPotential()[box.index(i, j, k)];
+        convert_and_inject_variables(std::make_tuple(nx, ny, nz, lx, ly, lz),
+                                    std::make_tuple("nx", "ny", "nz", "lx", "ly", "lz"));
 
-    std::cout << "Potential at center: " << center_potential << " V" << std::endl;
-
-    double energy = 0.1 * kev_to_joule;
-    double vx = sqrt(2 * energy / mH);
-
-    Particle p(0.1 * cm, 0.5 * cm, 0.5 * cm, vx, vx/10, 0, qe, mH); // x, y, z, vx, vy, vz, q, m
-    int res_t = 20000;
-    double t_max = 10.0 * cm / p.v;
-    double dt = t_max / res_t;
-    propagator(p, box, t_max, dt);
-
-    Py_Initialize();
-    PyRun_SimpleString("from mayavi import mlab\nimport numpy as np");
-
-    convert_and_inject_vectors(std::make_tuple(box.geometry),
-                               std::make_tuple("box_potential"));
-
-    convert_and_inject_variables(std::make_tuple(nx, ny, nz, lx, ly, lz),
-                                 std::make_tuple("nx", "ny", "nz", "lx", "ly", "lz"));
-
-    convert_and_inject_vectors(std::make_tuple(p.posx, p.posy, p.posz),
-                               std::make_tuple("p_posx", "p_posy", "p_posz"));
-
-    const char *pyCode1 = R"(
+        const char *pyCode = R"(
 box_potential = np.array(box_potential)
-p_posx=np.array(p_posx)
-p_posy=np.array(p_posy)
-p_posz=np.array(p_posz)
-
-print(p_posx)
-print(p_posy)
-print(p_posz)
-
 x, y, z = np.mgrid[0:lx:nx*1j,0:ly:ny*1j,0:lz:nz*1j]
 contours=50
 opacity=0.08
@@ -973,19 +973,22 @@ cmap="jet"
 print(x.shape)
 box_potential=box_potential.reshape(x.shape)
 print(box_potential.shape)
-
 mlab.figure(bgcolor=(1, 1, 1), size=(800, 600))
 mlab.contour3d(x, y, z, box_potential, contours=contours, opacity=opacity, colormap=cmap)
 mlab.colorbar(title="potential", orientation='vertical')
 axes = mlab.axes(xlabel='X', ylabel='Y', zlabel='Z',color=(1.0,0.0,0.0))
-axes.title_text_property.color = (1.0, 0.0, 0.0)  # red title text (if titles used)
-axes.label_text_property.color = (1.0, 0.0, 0.0)  # blue label text
+axes.title_text_property.color = (1.0, 0.0, 0.0)
+axes.label_text_property.color = (1.0, 0.0, 0.0)
 mlab.title("3D Isosurface of Potential")
-mlab.plot3d(p_posx,p_posy,p_posz, tube_radius=0.005*1e-2, color=(1,1,1), tube_sides=12)
 mlab.show()
 )";
 
-    PyRun_SimpleString(pyCode1);
-
-    return 0;
+        PyRun_SimpleString(pyCode);
+        Py_Finalize();
+        return 0;
+    }
+    catch (const std::exception& e) {
+        std::cerr << "Error: " << e.what() << std::endl;
+        return 1;
+    }
 }

@@ -1,3 +1,24 @@
+/*
+Author: SAGAR DAM   
+Date: 25.05.2025
+
+This is the basic code for a particle propagator in the arbitrarily given E and B field.
+Generally in experiemtal situation, the B filed is fixed and given by some permanent magnet. 
+
+The E field is defined by the potentials on several electrodes in the system. Here in this system we apply steady
+B field (Bx, By, Bz) as the global variable. Then in the main funciton we define the simulation box as a 3d box with 
+given sides and resolution. The electrodeds can take the shapes like plate (capacitor), sphere, cylinder, hyperboloide,
+ellipsoid, hollow pipe, or rectangular box. And combination of them that gives a valid boundary condition is also allowed. 
+Arbitrary shapes are not possible in this scope.
+
+The simulator solves the Laplace equation numerically over the grid points and. The test particle (or multiparticles) can 
+be injected into the system with initial position and velocity. The function named propagator(particle) uses boris pusher
+to simulate the particle trajectory over given time and resolution. The required variables to plot is then passed 
+to a temporary python __main__ for easier visualization. The python package Mayavi is used for the visual tool. 
+
+*/
+
+
 #include <iomanip>
 #include <limits>
 #include <vector>
@@ -60,6 +81,7 @@ public:
     const std::vector<double> &getPotential() const { return potential; }
 
     std::vector<double> potential;
+    std::vector<double> geometry;
     std::vector<bool> fixed_mask;
 
     int index(int i, int j, int k) const
@@ -82,6 +104,7 @@ SimulationBox3D::SimulationBox3D(int nx, int ny, int nz,
 
     int total_size = nx * ny * nz;
     potential.resize(total_size, potential_offset);
+    geometry=potential;
     fixed_mask.resize(total_size, false);
 }
 
@@ -116,7 +139,7 @@ void SimulationBox3D::solve(int max_iter, double tol, const std::string &method)
 
         std::cout << "Iteration " << iter << ", Max Diff = " << max_diff << std::endl;
 
-        if (max_diff < tol)
+        if (max_diff <= tol)
         {
             std::cout << "Converged at iteration " << iter << std::endl;
             break;
@@ -142,6 +165,7 @@ void SimulationBox3D::addSphere(double cx, double cy, double cz, double radius, 
                 {
                     int idx = index(i, j, k);
                     potential[idx] = potential_value;
+                    geometry[idx] = potential_value;
                     fixed_mask[idx] = true;
                 }
             }
@@ -170,6 +194,7 @@ void SimulationBox3D::addBox(double x0, double y0, double z0,
 
                 int idx = index(i, j, k);
                 potential[idx] = potential_value;
+                geometry[idx] = potential_value;
                 fixed_mask[idx] = true;
             }
         }
@@ -209,6 +234,7 @@ void SimulationBox3D::addCylinder(double cx, double cy, double cz, double radius
                 {
                     int idx = index(i, j, k);
                     potential[idx] = potential_value;
+                    geometry[idx] = potential_value;
                     fixed_mask[idx] = true;
                 }
             }
@@ -252,6 +278,7 @@ void SimulationBox3D::addHollowPipe(double cx, double cy, double cz, double radi
                 {
                     int idx = index(i, j, k);
                     potential[idx] = potential_value;
+                    geometry[idx] = potential_value;
                     fixed_mask[idx] = true;
                 }
             }
@@ -275,6 +302,7 @@ void SimulationBox3D::addEllipsoid(double cx, double cy, double cz, double rx, d
                 {
                     int idx = index(i, j, k);
                     potential[idx] = potential_value;
+                    geometry[idx] = potential_value;
                     fixed_mask[idx] = true;
                 }
             }
@@ -311,6 +339,7 @@ void SimulationBox3D::addHyperboloid(double cx, double cy, double cz, double a, 
                 {
                     int idx = index(i, j, k);
                     potential[idx] = potential_value;
+                    geometry[idx] = potential_value;
                     fixed_mask[idx] = true;
                 }
             }
@@ -335,6 +364,7 @@ void SimulationBox3D::addPlane(double A, double B, double C, double D, double th
                 {
                     int idx = index(i, j, k);
                     potential[idx] = potential_value;
+                    geometry[idx] = potential_value;
                     fixed_mask[idx] = true;
                 }
             }
@@ -748,6 +778,118 @@ void convert_and_inject_tensors(const std::tuple<Tensors...> &tensors, const std
     convert_and_inject_tensors_impl(tensors, names, std::index_sequence_for<Tensors...>{});
 }
 
+
+
+/*
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+                                        HELPER FUNCTIONS
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
+*/
+
+// get max(abs(vector<double>)) 
+// say x=std::vector<double>{-2,3.5,6.8}
+// output = 6.8
+double max_AbsoluteValue_doubel_vector(const std::vector<double>& vec) {
+    double maxAbsValue = 0.0;
+
+    for (double num : vec) {
+        double absValue = std::abs(num);
+        if (absValue > maxAbsValue) {
+            maxAbsValue = absValue;
+        }
+    }
+
+    return maxAbsValue;
+}
+
+// print a 1d vector
+template <typename T>
+void print_1d_vector(const std::vector<T>& v)
+{
+    for (const auto& elem : v)
+    {
+        std::cout << elem << " ";
+    }
+    std::cout << std::endl;
+}
+
+// function to concatenate double vector like np.concatenate. y=concatenate(x,y,z)
+// will  give [x1,x2,x3,.... , y1,y2,y3, .... , z1,z2,z3,....]
+std::vector<double> concatenate(const std::initializer_list<std::vector<double>> &vectors)
+{
+    std::vector<double> result;
+
+    // Reserve total size to avoid reallocations
+    size_t total_size = 0;
+    for (const auto &vec : vectors)
+        total_size += vec.size();
+    result.reserve(total_size);
+
+    // Insert all elements
+    for (const auto &vec : vectors)
+        result.insert(result.end(), vec.begin(), vec.end());
+
+    return result;
+}
+
+// make a linspace for double value like np.linspace
+std::vector<double> linspace(double start, double end, int num)
+{
+    std::vector<double> result(num);
+    double step = (end - start) / (num - 1);
+    for (int i = 0; i < num; ++i)
+    {
+        result[i] = start + step * i;
+    }
+    return result;
+}
+
+// solve a 2x2 matrix equation (helper functon)
+std::pair<double, double> solve2x2(double a11, double a12, double a21, double a22, double b1, double b2)
+{
+    double det = a11 * a22 - a12 * a21;
+    if (std::abs(det) < 1e-12)
+        throw std::runtime_error("Singular matrix");
+
+    double alpha = (b1 * a22 - b2 * a12) / det;
+    double beta = (a11 * b2 - a21 * b1) / det;
+
+    return {alpha, beta};
+}
+
+// get a exponential distribution for particle with given steepness
+// more particle in low energy and less in high
+std::vector<double> generate_scaled_energy(double low_energy, double high_energy, int no_of_particles, double steep)
+{
+    std::vector<double> raw = linspace(0.0, 10.0, no_of_particles);
+    for (double &val : raw)
+    {
+        val = std::exp(-val / steep);
+    }
+
+    double last_raw = raw.back();
+
+    // Linear system to get alpha, beta
+    auto [alpha, beta] = solve2x2(
+        low_energy, (high_energy - low_energy),
+        low_energy, last_raw * (high_energy - low_energy),
+        high_energy, low_energy);
+
+    std::vector<double> Energy(no_of_particles);
+    for (int i = 0; i < no_of_particles; ++i)
+    {
+        Energy[i] = (alpha * low_energy + beta * raw[i] * (high_energy - low_energy)) * kev_to_joule;
+    }
+
+    return Energy;
+}
+
+
+
 /*
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -772,14 +914,20 @@ int main()
     // Add a box at a lower corner at -1V
     // box.addBox(0.1, 0.1, 0.1, 0.2, 0.2, 0.2, -1.0);
 
-    box.addPlane(0, 0, 1, -0.3 * cm, 0.03 * cm, 2000);
-    box.addPlane(0, 0, 1, -0.7 * cm, 0.03 * cm, -2000);
+    // box.addPlane(0, 0, 1, -0.3 * cm, 0.03 * cm, 2000);
+    // box.addPlane(0, 0, 1, -0.7 * cm, 0.03 * cm, 2000);
 
-    box.addCylinder(0 * cm, 0.2 * cm, 0.5 * cm, 0.05 * cm, 2 * cm, 'x', 2000);
-    box.addCylinder(0 * cm, 0.8 * cm, 0.5 * cm, 0.05 * cm, 2 * cm, 'x', -2000);
-
+    box.addCylinder(0 * cm, 0.3 * cm, 0.3 * cm, 0.05 * cm, 2 * cm, 'x', 5000);
+    box.addCylinder(0 * cm, 0.7 * cm, 0.3 * cm, 0.05 * cm, 2 * cm, 'x', -5000);
+    box.addCylinder(0 * cm, 0.3 * cm, 0.7 * cm, 0.05 * cm, 2 * cm, 'x', -5000);
+    box.addCylinder(0 * cm, 0.7 * cm, 0.7 * cm, 0.05 * cm, 2 * cm, 'x', 5000);
+    box.addCylinder(0 * cm, 0.5 * cm, 0.1 * cm, 0.05 * cm, 2 * cm, 'x', 5000);
+    box.addCylinder(0 * cm, 0.5 * cm, 0.9 * cm, 0.05 * cm, 2 * cm, 'x', -5000);
+    box.addCylinder(0 * cm, 0.1 * cm, 0.5 * cm, 0.05 * cm, 2 * cm, 'x', 5000);
+    box.addCylinder(0 * cm, 0.9 * cm, 0.5 * cm, 0.05 * cm, 2 * cm, 'x', -5000);
     // Solve the Laplace equation
-    box.solve(5000, 3e-1, "gauss-seidel");
+    double tol = max_AbsoluteValue_doubel_vector(box.geometry)*0.0001;
+    box.solve(5000, tol, "gauss-seidel");
 
     // Check potential at center
     int i = nx / 2, j = ny / 2, k = nz / 2;
@@ -787,12 +935,12 @@ int main()
 
     std::cout << "Potential at center: " << center_potential << " V" << std::endl;
 
-    double energy = 2 * kev_to_joule;
+    double energy = 0.5 * kev_to_joule;
     double vx = sqrt(2 * energy / mH);
 
-    Particle p(0.1 * cm, 0.5 * cm, 0.5 * cm, vx, 0.0, 0.0, qe, mH); // x, y, z, vx, vy, vz, q, m
-    int res_t = 10000;
-    double t_max = 2.0 * cm / p.v;
+    Particle p(0.1 * cm, 0.5 * cm, 0.5 * cm, vx, -vx/2, -vx/2, qe, mH); // x, y, z, vx, vy, vz, q, m
+    int res_t = 20000;
+    double t_max = 4.0 * cm / p.v;
     double dt = t_max / res_t;
     propagator(p, box, t_max, dt);
 
@@ -820,7 +968,7 @@ print(p_posz)
 
 x, y, z = np.mgrid[0:lx:nx*1j,0:ly:ny*1j,0:lz:nz*1j]
 contours=50
-opacity=0.1
+opacity=0.08
 cmap="jet"
 print(x.shape)
 box_potential=box_potential.reshape(x.shape)
@@ -833,7 +981,7 @@ axes = mlab.axes(xlabel='X', ylabel='Y', zlabel='Z',color=(1.0,0.0,0.0))
 axes.title_text_property.color = (1.0, 0.0, 0.0)  # red title text (if titles used)
 axes.label_text_property.color = (1.0, 0.0, 0.0)  # blue label text
 mlab.title("3D Isosurface of Potential")
-mlab.plot3d(p_posx,p_posy,p_posz, tube_radius=0.01*1e-2, color=(0,0,0), tube_sides=12)
+mlab.plot3d(p_posx,p_posy,p_posz, tube_radius=0.005*1e-2, color=(0,1,0), tube_sides=12)
 mlab.show()
 )";
 

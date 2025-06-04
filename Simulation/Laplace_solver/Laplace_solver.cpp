@@ -561,11 +561,11 @@ int main() {
     // Add a box at a lower corner at -1V
     // box.addBox(0.1, 0.1, 0.1, 0.2, 0.2, 0.2, -1.0);
 
-    box.addPlane(0,0,1,-0.3,0.1,1000);
-    box.addPlane(0,0,1,-0.7,0.1,-1000);
+    box.addPlane(0,0,1,-0.3,0.01,2000);
+    box.addPlane(0,0,1,-0.7,0.01,-2000);
 
-    box.addCylinder(0,0.2,0.5,0.1,2,'x',1000);
-    box.addCylinder(0,0.8,0.5,0.1,2,'x',-1000);
+    box.addCylinder(0,0.2,0.5,0.1,2,'x',2000);
+    box.addCylinder(0,0.8,0.5,0.1,2,'x',-2000);
 
 
 
@@ -591,7 +591,7 @@ int main() {
 box_potential = np.array(box_potential)
 x, y, z = np.mgrid[0:lx:nx*1j,0:ly:ny*1j,0:lz:nz*1j]
 contours=50
-opacity=0.4
+opacity=0.08
 cmap="jet"
 print(x.shape)
 box_potential=box_potential.reshape(x.shape)
