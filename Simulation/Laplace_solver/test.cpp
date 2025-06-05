@@ -376,6 +376,7 @@ void SimulationBox3D::applyJacobi()
 {
     std::vector<double> new_potential = potential;
 
+    // Interior points
     for (int i = 1; i < nx - 1; ++i)
     {
         for (int j = 1; j < ny - 1; ++j)
@@ -386,17 +387,170 @@ void SimulationBox3D::applyJacobi()
                 if (!fixed_mask[idx])
                 {
                     new_potential[idx] = (1.0 / 6.0) * (potential[index(i + 1, j, k)] + potential[index(i - 1, j, k)] +
-                                                        potential[index(i, j + 1, k)] + potential[index(i, j - 1, k)] +
-                                                        potential[index(i, j, k + 1)] + potential[index(i, j, k - 1)]);
+                                                       potential[index(i, j + 1, k)] + potential[index(i, j - 1, k)] +
+                                                       potential[index(i, j, k + 1)] + potential[index(i, j, k - 1)]);
                 }
             }
         }
     }
+
+    // Face points
+    for (int j = 1; j < ny - 1; ++j)
+    {
+        for (int k = 1; k < nz - 1; ++k)
+        {
+            int idx = index(0, j, k);
+            if (!fixed_mask[idx])
+                new_potential[idx] = (1.0 / 5.0) * (potential[index(1, j, k)] + potential[index(0, j + 1, k)] +
+                                                   potential[index(0, j - 1, k)] + potential[index(0, j, k + 1)] +
+                                                   potential[index(0, j, k - 1)]);
+
+            int idx1 = index(nx - 1, j, k);
+            if (!fixed_mask[idx1])
+                new_potential[idx1] = (1.0 / 5.0) * (potential[index(nx - 2, j, k)] + potential[index(nx - 1, j + 1, k)] +
+                                                    potential[index(nx - 1, j - 1, k)] + potential[index(nx - 1, j, k + 1)] +
+                                                    potential[index(nx - 1, j, k - 1)]);
+        }
+    }
+
+    for (int i = 1; i < nx - 1; ++i)
+    {
+        for (int k = 1; k < nz - 1; ++k)
+        {
+            int idx = index(i, 0, k);
+            if (!fixed_mask[idx])
+                new_potential[idx] = (1.0 / 5.0) * (potential[index(i + 1, 0, k)] + potential[index(i - 1, 0, k)] +
+                                                   potential[index(i, 1, k)] + potential[index(i, 0, k + 1)] +
+                                                   potential[index(i, 0, k - 1)]);
+
+            int idx1 = index(i, ny - 1, k);
+            if (!fixed_mask[idx1])
+                new_potential[idx1] = (1.0 / 5.0) * (potential[index(i + 1, ny - 1, k)] + potential[index(i - 1, ny - 1, k)] +
+                                                    potential[index(i, ny - 2, k)] + potential[index(i, ny - 1, k + 1)] +
+                                                    potential[index(i, ny - 1, k - 1)]);
+        }
+    }
+
+    for (int i = 1; i < nx - 1; ++i)
+    {
+        for (int j = 1; j < ny - 1; ++j)
+        {
+            int idx = index(i, j, 0);
+            if (!fixed_mask[idx])
+                new_potential[idx] = (1.0 / 5.0) * (potential[index(i + 1, j, 0)] + potential[index(i - 1, j, 0)] +
+                                                   potential[index(i, j + 1, 0)] + potential[index(i, j - 1, 0)] +
+                                                   potential[index(i, j, 1)]);
+
+            int idx1 = index(i, j, nz - 1);
+            if (!fixed_mask[idx1])
+                new_potential[idx1] = (1.0 / 5.0) * (potential[index(i + 1, j, nz - 1)] + potential[index(i - 1, j, nz - 1)] +
+                                                    potential[index(i, j + 1, nz - 1)] + potential[index(i, j - 1, nz - 1)] +
+                                                    potential[index(i, j, nz - 2)]);
+        }
+    }
+
+    // Edge points (4 neighbors)
+    for (int k = 1; k < nz - 1; ++k)
+    {
+        int idx = index(0, 0, k);
+        if (!fixed_mask[idx])
+            new_potential[idx] = (1.0 / 4.0) * (potential[index(1, 0, k)] + potential[index(0, 1, k)] +
+                                               potential[index(0, 0, k + 1)] + potential[index(0, 0, k - 1)]);
+
+        int idx1 = index(0, ny - 1, k);
+        if (!fixed_mask[idx1])
+            new_potential[idx1] = (1.0 / 4.0) * (potential[index(1, ny - 1, k)] + potential[index(0, ny - 2, k)] +
+                                                potential[index(0, ny - 1, k + 1)] + potential[index(0, ny - 1, k - 1)]);
+
+        int idx2 = index(nx - 1, 0, k);
+        if (!fixed_mask[idx2])
+            new_potential[idx2] = (1.0 / 4.0) * (potential[index(nx - 2, 0, k)] + potential[index(nx - 1, 1, k)] +
+                                                potential[index(nx - 1, 0, k + 1)] + potential[index(nx - 1, 0, k - 1)]);
+
+        int idx3 = index(nx - 1, ny - 1, k);
+        if (!fixed_mask[idx3])
+            new_potential[idx3] = (1.0 / 4.0) * (potential[index(nx - 2, ny - 1, k)] + potential[index(nx - 1, ny - 2, k)] +
+                                                potential[index(nx - 1, ny - 1, k + 1)] + potential[index(nx - 1, ny - 1, k - 1)]);
+    }
+
+    for (int j = 1; j < ny - 1; ++j)
+    {
+        int idx = index(0, j, 0);
+        if (!fixed_mask[idx])
+            new_potential[idx] = (1.0 / 4.0) * (potential[index(1, j, 0)] + potential[index(0, j + 1, 0)] +
+                                               potential[index(0, j - 1, 0)] + potential[index(0, j, 1)]);
+
+        int idx1 = index(nx - 1, j, 0);
+        if (!fixed_mask[idx1])
+            new_potential[idx1] = (1.0 / 4.0) * (potential[index(nx - 2, j, 0)] + potential[index(nx - 1, j + 1, 0)] +
+                                                potential[index(nx - 1, j - 1, 0)] + potential[index(nx - 1, j, 1)]);
+
+        int idx2 = index(0, j, nz - 1);
+        if (!fixed_mask[idx2])
+            new_potential[idx2] = (1.0 / 4.0) * (potential[index(1, j, nz - 1)] + potential[index(0, j + 1, nz - 1)] +
+                                                potential[index(0, j - 1, nz - 1)] + potential[index(0, j, nz - 2)]);
+
+        int idx3 = index(nx - 1, j, nz - 1);
+        if (!fixed_mask[idx3])
+            new_potential[idx3] = (1.0 / 4.0) * (potential[index(nx - 2, j, nz - 1)] + potential[index(nx - 1, j + 1, nz - 1)] +
+                                                potential[index(nx - 1, j - 1, nz - 1)] + potential[index(nx - 1, j, nz - 2)]);
+    }
+
+    for (int i = 1; i < nx - 1; ++i)
+    {
+        int idx = index(i, 0, 0);
+        if (!fixed_mask[idx])
+            new_potential[idx] = (1.0 / 4.0) * (potential[index(i + 1, 0, 0)] + potential[index(i - 1, 0, 0)] +
+                                               potential[index(i, 1, 0)] + potential[index(i, 0, 1)]);
+
+        int idx1 = index(i, ny - 1, 0);
+        if (!fixed_mask[idx1])
+            new_potential[idx1] = (1.0 / 4.0) * (potential[index(i + 1, ny - 1, 0)] + potential[index(i - 1, ny - 1, 0)] +
+                                                potential[index(i, ny - 2, 0)] + potential[index(i, ny - 1, 1)]);
+
+        int idx2 = index(i, 0, nz - 1);
+        if (!fixed_mask[idx2])
+            new_potential[idx2] = (1.0 / 4.0) * (potential[index(i + 1, 0, nz - 1)] + potential[index(i - 1, 0, nz - 1)] +
+                                                potential[index(i, 1, nz - 1)] + potential[index(i, 0, nz - 2)]);
+
+        int idx3 = index(i, ny - 1, nz - 1);
+        if (!fixed_mask[idx3])
+            new_potential[idx3] = (1.0 / 4.0) * (potential[index(i + 1, ny - 1, nz - 1)] + potential[index(i - 1, ny - 1, nz - 1)] +
+                                                potential[index(i, ny - 2, nz - 1)] + potential[index(i, ny - 1, nz - 2)]);
+    }
+
+    // Corner points (3 neighbors)
+    if (!fixed_mask[index(0, 0, 0)])
+        new_potential[index(0, 0, 0)] = (1.0 / 3.0) * (potential[index(1, 0, 0)] + potential[index(0, 1, 0)] + potential[index(0, 0, 1)]);
+
+    if (!fixed_mask[index(nx - 1, 0, 0)])
+        new_potential[index(nx - 1, 0, 0)] = (1.0 / 3.0) * (potential[index(nx - 2, 0, 0)] + potential[index(nx - 1, 1, 0)] + potential[index(nx - 1, 0, 1)]);
+
+    if (!fixed_mask[index(0, ny - 1, 0)])
+        new_potential[index(0, ny - 1, 0)] = (1.0 / 3.0) * (potential[index(1, ny - 1, 0)] + potential[index(0, ny - 2, 0)] + potential[index(0, ny - 1, 1)]);
+
+    if (!fixed_mask[index(nx - 1, ny - 1, 0)])
+        new_potential[index(nx - 1, ny - 1, 0)] = (1.0 / 3.0) * (potential[index(nx - 2, ny - 1, 0)] + potential[index(nx - 1, ny - 2, 0)] + potential[index(nx - 1, ny - 1, 1)]);
+
+    if (!fixed_mask[index(0, 0, nz - 1)])
+        new_potential[index(0, 0, nz - 1)] = (1.0 / 3.0) * (potential[index(1, 0, nz - 1)] + potential[index(0, 1, nz - 1)] + potential[index(0, 0, nz - 2)]);
+
+    if (!fixed_mask[index(nx - 1, 0, nz - 1)])
+        new_potential[index(nx - 1, 0, nz - 1)] = (1.0 / 3.0) * (potential[index(nx - 2, 0, nz - 1)] + potential[index(nx - 1, 1, nz - 1)] + potential[index(nx - 1, 0, nz - 2)]);
+
+    if (!fixed_mask[index(0, ny - 1, nz - 1)])
+        new_potential[index(0, ny - 1, nz - 1)] = (1.0 / 3.0) * (potential[index(1, ny - 1, nz - 1)] + potential[index(0, ny - 2, nz - 1)] + potential[index(0, ny - 1, nz - 2)]);
+
+    if (!fixed_mask[index(nx - 1, ny - 1, nz - 1)])
+        new_potential[index(nx - 1, ny - 1, nz - 1)] = (1.0 / 3.0) * (potential[index(nx - 2, ny - 1, nz - 1)] + potential[index(nx - 1, ny - 2, nz - 1)] + potential[index(nx - 1, ny - 1, nz - 2)]);
+
+    // Final update
     potential = std::move(new_potential);
 }
 
 void SimulationBox3D::applyGaussSeidel()
 {
+    // Interior points
     for (int i = 1; i < nx - 1; ++i)
     {
         for (int j = 1; j < ny - 1; ++j)
@@ -407,13 +561,165 @@ void SimulationBox3D::applyGaussSeidel()
                 if (!fixed_mask[idx])
                 {
                     potential[idx] = (1.0 / 6.0) * (potential[index(i + 1, j, k)] + potential[index(i - 1, j, k)] +
-                                                    potential[index(i, j + 1, k)] + potential[index(i, j - 1, k)] +
-                                                    potential[index(i, j, k + 1)] + potential[index(i, j, k - 1)]);
+                                                   potential[index(i, j + 1, k)] + potential[index(i, j - 1, k)] +
+                                                   potential[index(i, j, k + 1)] + potential[index(i, j, k - 1)]);
                 }
             }
         }
     }
+
+    // Face points (excluding edges and corners)
+    for (int j = 1; j < ny - 1; ++j)
+    {
+        for (int k = 1; k < nz - 1; ++k)
+        {
+            int idx = index(0, j, k);
+            if (!fixed_mask[idx])
+                potential[idx] = (1.0 / 5.0) * (potential[index(1, j, k)] + potential[index(0, j + 1, k)] +
+                                               potential[index(0, j - 1, k)] + potential[index(0, j, k + 1)] +
+                                               potential[index(0, j, k - 1)]);
+
+            int idx1 = index(nx - 1, j, k);
+            if (!fixed_mask[idx1])
+                potential[idx1] = (1.0 / 5.0) * (potential[index(nx - 2, j, k)] + potential[index(nx - 1, j + 1, k)] +
+                                                potential[index(nx - 1, j - 1, k)] + potential[index(nx - 1, j, k + 1)] +
+                                                potential[index(nx - 1, j, k - 1)]);
+        }
+    }
+
+    for (int i = 1; i < nx - 1; ++i)
+    {
+        for (int k = 1; k < nz - 1; ++k)
+        {
+            int idx = index(i, 0, k);
+            if (!fixed_mask[idx])
+                potential[idx] = (1.0 / 5.0) * (potential[index(i + 1, 0, k)] + potential[index(i - 1, 0, k)] +
+                                               potential[index(i, 1, k)] + potential[index(i, 0, k + 1)] +
+                                               potential[index(i, 0, k - 1)]);
+
+            int idx1 = index(i, ny - 1, k);
+            if (!fixed_mask[idx1])
+                potential[idx1] = (1.0 / 5.0) * (potential[index(i + 1, ny - 1, k)] + potential[index(i - 1, ny - 1, k)] +
+                                                potential[index(i, ny - 2, k)] + potential[index(i, ny - 1, k + 1)] +
+                                                potential[index(i, ny - 1, k - 1)]);
+        }
+    }
+
+    for (int i = 1; i < nx - 1; ++i)
+    {
+        for (int j = 1; j < ny - 1; ++j)
+        {
+            int idx = index(i, j, 0);
+            if (!fixed_mask[idx])
+                potential[idx] = (1.0 / 5.0) * (potential[index(i + 1, j, 0)] + potential[index(i - 1, j, 0)] +
+                                               potential[index(i, j + 1, 0)] + potential[index(i, j - 1, 0)] +
+                                               potential[index(i, j, 1)]);
+
+            int idx1 = index(i, j, nz - 1);
+            if (!fixed_mask[idx1])
+                potential[idx1] = (1.0 / 5.0) * (potential[index(i + 1, j, nz - 1)] + potential[index(i - 1, j, nz - 1)] +
+                                                potential[index(i, j + 1, nz - 1)] + potential[index(i, j - 1, nz - 1)] +
+                                                potential[index(i, j, nz - 2)]);
+        }
+    }
+
+    // Edge points (4 neighbors)
+    for (int k = 1; k < nz - 1; ++k)
+    {
+        // x edges at y=0 and y=ny-1
+        int idx = index(0, 0, k);
+        if (!fixed_mask[idx])
+            potential[idx] = (1.0 / 4.0) * (potential[index(1, 0, k)] + potential[index(0, 1, k)] +
+                                           potential[index(0, 0, k + 1)] + potential[index(0, 0, k - 1)]);
+
+        int idx1 = index(0, ny - 1, k);
+        if (!fixed_mask[idx1])
+            potential[idx1] = (1.0 / 4.0) * (potential[index(1, ny - 1, k)] + potential[index(0, ny - 2, k)] +
+                                            potential[index(0, ny - 1, k + 1)] + potential[index(0, ny - 1, k - 1)]);
+
+        int idx2 = index(nx - 1, 0, k);
+        if (!fixed_mask[idx2])
+            potential[idx2] = (1.0 / 4.0) * (potential[index(nx - 2, 0, k)] + potential[index(nx - 1, 1, k)] +
+                                            potential[index(nx - 1, 0, k + 1)] + potential[index(nx - 1, 0, k - 1)]);
+
+        int idx3 = index(nx - 1, ny - 1, k);
+        if (!fixed_mask[idx3])
+            potential[idx3] = (1.0 / 4.0) * (potential[index(nx - 2, ny - 1, k)] + potential[index(nx - 1, ny - 2, k)] +
+                                            potential[index(nx - 1, ny - 1, k + 1)] + potential[index(nx - 1, ny - 1, k - 1)]);
+    }
+
+    for (int j = 1; j < ny - 1; ++j)
+    {
+        int idx = index(0, j, 0);
+        if (!fixed_mask[idx])
+            potential[idx] = (1.0 / 4.0) * (potential[index(1, j, 0)] + potential[index(0, j + 1, 0)] +
+                                           potential[index(0, j - 1, 0)] + potential[index(0, j, 1)]);
+
+        int idx1 = index(nx - 1, j, 0);
+        if (!fixed_mask[idx1])
+            potential[idx1] = (1.0 / 4.0) * (potential[index(nx - 2, j, 0)] + potential[index(nx - 1, j + 1, 0)] +
+                                            potential[index(nx - 1, j - 1, 0)] + potential[index(nx - 1, j, 1)]);
+
+        int idx2 = index(0, j, nz - 1);
+        if (!fixed_mask[idx2])
+            potential[idx2] = (1.0 / 4.0) * (potential[index(1, j, nz - 1)] + potential[index(0, j + 1, nz - 1)] +
+                                            potential[index(0, j - 1, nz - 1)] + potential[index(0, j, nz - 2)]);
+
+        int idx3 = index(nx - 1, j, nz - 1);
+        if (!fixed_mask[idx3])
+            potential[idx3] = (1.0 / 4.0) * (potential[index(nx - 2, j, nz - 1)] + potential[index(nx - 1, j + 1, nz - 1)] +
+                                            potential[index(nx - 1, j - 1, nz - 1)] + potential[index(nx - 1, j, nz - 2)]);
+    }
+
+    for (int i = 1; i < nx - 1; ++i)
+    {
+        int idx = index(i, 0, 0);
+        if (!fixed_mask[idx])
+            potential[idx] = (1.0 / 4.0) * (potential[index(i + 1, 0, 0)] + potential[index(i - 1, 0, 0)] +
+                                           potential[index(i, 1, 0)] + potential[index(i, 0, 1)]);
+
+        int idx1 = index(i, ny - 1, 0);
+        if (!fixed_mask[idx1])
+            potential[idx1] = (1.0 / 4.0) * (potential[index(i + 1, ny - 1, 0)] + potential[index(i - 1, ny - 1, 0)] +
+                                            potential[index(i, ny - 2, 0)] + potential[index(i, ny - 1, 1)]);
+
+        int idx2 = index(i, 0, nz - 1);
+        if (!fixed_mask[idx2])
+            potential[idx2] = (1.0 / 4.0) * (potential[index(i + 1, 0, nz - 1)] + potential[index(i - 1, 0, nz - 1)] +
+                                            potential[index(i, 1, nz - 1)] + potential[index(i, 0, nz - 2)]);
+
+        int idx3 = index(i, ny - 1, nz - 1);
+        if (!fixed_mask[idx3])
+            potential[idx3] = (1.0 / 4.0) * (potential[index(i + 1, ny - 1, nz - 1)] + potential[index(i - 1, ny - 1, nz - 1)] +
+                                            potential[index(i, ny - 2, nz - 1)] + potential[index(i, ny - 1, nz - 2)]);
+    }
+
+    // Corners (3 neighbors)
+    if (!fixed_mask[index(0, 0, 0)])
+        potential[index(0, 0, 0)] = (1.0 / 3.0) * (potential[index(1, 0, 0)] + potential[index(0, 1, 0)] + potential[index(0, 0, 1)]);
+
+    if (!fixed_mask[index(nx - 1, 0, 0)])
+        potential[index(nx - 1, 0, 0)] = (1.0 / 3.0) * (potential[index(nx - 2, 0, 0)] + potential[index(nx - 1, 1, 0)] + potential[index(nx - 1, 0, 1)]);
+
+    if (!fixed_mask[index(0, ny - 1, 0)])
+        potential[index(0, ny - 1, 0)] = (1.0 / 3.0) * (potential[index(1, ny - 1, 0)] + potential[index(0, ny - 2, 0)] + potential[index(0, ny - 1, 1)]);
+
+    if (!fixed_mask[index(nx - 1, ny - 1, 0)])
+        potential[index(nx - 1, ny - 1, 0)] = (1.0 / 3.0) * (potential[index(nx - 2, ny - 1, 0)] + potential[index(nx - 1, ny - 2, 0)] + potential[index(nx - 1, ny - 1, 1)]);
+
+    if (!fixed_mask[index(0, 0, nz - 1)])
+        potential[index(0, 0, nz - 1)] = (1.0 / 3.0) * (potential[index(1, 0, nz - 1)] + potential[index(0, 1, nz - 1)] + potential[index(0, 0, nz - 2)]);
+
+    if (!fixed_mask[index(nx - 1, 0, nz - 1)])
+        potential[index(nx - 1, 0, nz - 1)] = (1.0 / 3.0) * (potential[index(nx - 2, 0, nz - 1)] + potential[index(nx - 1, 1, nz - 1)] + potential[index(nx - 1, 0, nz - 2)]);
+
+    if (!fixed_mask[index(0, ny - 1, nz - 1)])
+        potential[index(0, ny - 1, nz - 1)] = (1.0 / 3.0) * (potential[index(1, ny - 1, nz - 1)] + potential[index(0, ny - 2, nz - 1)] + potential[index(0, ny - 1, nz - 2)]);
+
+    if (!fixed_mask[index(nx - 1, ny - 1, nz - 1)])
+        potential[index(nx - 1, ny - 1, nz - 1)] = (1.0 / 3.0) * (potential[index(nx - 2, ny - 1, nz - 1)] + potential[index(nx - 1, ny - 2, nz - 1)] + potential[index(nx - 1, ny - 1, nz - 2)]);
 }
+
 
 /*
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -914,11 +1220,11 @@ int main()
     // Add a box at a lower corner at -1V
     // box.addBox(0.1, 0.1, 0.1, 0.2, 0.2, 0.2, -1.0);
 
-    // box.addPlane(0, 0, 1, -0.3 * cm, 0.03 * cm, 2000);
-    // box.addPlane(0, 0, 1, -0.7 * cm, 0.03 * cm, 2000);
+    box.addPlane(0, 0, 1, -0.9 * cm, 0.01 * cm, 5000);
+    box.addPlane(0, 0, 1, -0.1 * cm, 0.01 * cm, -5000);
 
-    // box.addCylinder(0 * cm, 0.3 * cm, 0.3 * cm, 0.05 * cm, 2 * cm, 'x', 5000);
-    // box.addCylinder(0 * cm, 0.7 * cm, 0.3 * cm, 0.05 * cm, 2 * cm, 'x', -5000);
+    box.addCylinder(0 * cm, 0.3 * cm, 0.3 * cm, 0.05 * cm, 2 * cm, 'x', 5000);
+    box.addCylinder(0 * cm, 0.7 * cm, 0.3 * cm, 0.05 * cm, 2 * cm, 'x', -5000);
     // box.addCylinder(0 * cm, 0.3 * cm, 0.7 * cm, 0.05 * cm, 2 * cm, 'x', -5000);
     // box.addCylinder(0 * cm, 0.7 * cm, 0.7 * cm, 0.05 * cm, 2 * cm, 'x', 5000);
     // box.addCylinder(0 * cm, 0.5 * cm, 0.1 * cm, 0.05 * cm, 2 * cm, 'x', 5000);

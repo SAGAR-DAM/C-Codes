@@ -1,8 +1,8 @@
 {
   "simulation_box": {
-    "nx": 200,
-    "ny": 200,
-    "nz": 200,
+    "nx": 100,
+    "ny": 50,
+    "nz": 50,
     "lx": 2.0,
     "ly": 1.0,
     "lz": 1.0
@@ -18,12 +18,23 @@
       "axis": "x",
       "potential": 5000.0
     },
+{
+      "type": "Cylinder",
+      "cx": 0.0,
+      "cy": 0.7,
+      "cz": 0.7,
+      "radius": 0.05,
+      "height": 2.0,
+      "axis": "x",
+      "potential": 5000.0
+    },
+
     {
       "type": "Sphere",
-      "cx": 0.5,
+      "cx": 0.0,
       "cy": 0.5,
       "cz": 0.5,
-      "radius": 0.2,
+      "radius": 0.1,
       "potential": -5000.0
     }
   ],
