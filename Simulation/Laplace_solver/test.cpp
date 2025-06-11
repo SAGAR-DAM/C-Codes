@@ -31,6 +31,7 @@ to a temporary python __main__ for easier visualization. The python package Maya
 
 using namespace std;
 
+
 double Bx = 0;
 double By = 2;
 double Bz = 0;
@@ -1099,7 +1100,7 @@ void convert_and_inject_tensors(const std::tuple<Tensors...> &tensors, const std
 // get max(abs(vector<double>)) 
 // say x=std::vector<double>{-2,3.5,6.8}
 // output = 6.8
-double max_AbsoluteValue_doubel_vector(const std::vector<double>& vec) {
+double max_AbsoluteValue_double_vector(const std::vector<double>& vec) {
     double maxAbsValue = 0.0;
 
     for (double num : vec) {
@@ -1223,8 +1224,8 @@ int main()
     box.addPlane(0, 0, 1, -0.9 * cm, 0.01 * cm, 5000);
     box.addPlane(0, 0, 1, -0.1 * cm, 0.01 * cm, -5000);
 
-    box.addCylinder(0 * cm, 0.3 * cm, 0.3 * cm, 0.05 * cm, 2 * cm, 'x', 5000);
-    box.addCylinder(0 * cm, 0.7 * cm, 0.3 * cm, 0.05 * cm, 2 * cm, 'x', -5000);
+    box.addCylinder(0 * cm, 0.3 * cm, 0.5 * cm, 0.05 * cm, 2 * cm, 'x', 5000);
+    box.addCylinder(0 * cm, 0.7 * cm, 0.5 * cm, 0.05 * cm, 2 * cm, 'x', -5000);
     // box.addCylinder(0 * cm, 0.3 * cm, 0.7 * cm, 0.05 * cm, 2 * cm, 'x', -5000);
     // box.addCylinder(0 * cm, 0.7 * cm, 0.7 * cm, 0.05 * cm, 2 * cm, 'x', 5000);
     // box.addCylinder(0 * cm, 0.5 * cm, 0.1 * cm, 0.05 * cm, 2 * cm, 'x', 5000);
@@ -1232,7 +1233,7 @@ int main()
     // box.addCylinder(0 * cm, 0.1 * cm, 0.5 * cm, 0.05 * cm, 2 * cm, 'x', 5000);
     // box.addCylinder(0 * cm, 0.9 * cm, 0.5 * cm, 0.05 * cm, 2 * cm, 'x', -5000);
     // Solve the Laplace equation
-    double tol = max_AbsoluteValue_doubel_vector(box.geometry)*0.001;
+    double tol = max_AbsoluteValue_double_vector(box.geometry)*0.001;
     box.solve(5000, tol, "gauss-seidel");
 
     // Check potential at center
@@ -1244,7 +1245,7 @@ int main()
     double energy = 0.1 * kev_to_joule;
     double vx = sqrt(2 * energy / mH);
 
-    Particle p(0.1 * cm, 0.5 * cm, 0.5 * cm, vx, vx/10, 0, qe, mH); // x, y, z, vx, vy, vz, q, m
+    Particle p(0.1 * cm, 0.5 * cm, 0.25 * cm, vx, vx/10, 0, qe, mH); // x, y, z, vx, vy, vz, q, m
     int res_t = 20000;
     double t_max = 10.0 * cm / p.v;
     double dt = t_max / res_t;

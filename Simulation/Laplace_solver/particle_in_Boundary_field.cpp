@@ -1208,7 +1208,7 @@ std::vector<double> generate_scaled_energy(double low_energy, double high_energy
 int main()
 {
     // Define grid size and physical size
-    int nx = 200, ny = 200, nz = 200;
+    int nx = 200, ny = 100, nz = 100;
     double lx = 2.0 * cm, ly = 1.0 * cm, lz = 1.0 * cm;
 
     SimulationBox3D box(nx, ny, nz, lx, ly, lz);
@@ -1232,7 +1232,7 @@ int main()
     box.addCylinder(0 * cm, 0.9 * cm, 0.5 * cm, 0.05 * cm, 2 * cm, 'x', -5000);
     // Solve the Laplace equation
     double tol = max_AbsoluteValue_doubel_vector(box.geometry)*0.0001;
-    box.solve(5000, tol, "gauss-seidel");
+    box.solve(1000, tol, "gauss-seidel");
 
     // Check potential at center
     int i = nx / 2, j = ny / 2, k = nz / 2;
@@ -1242,7 +1242,7 @@ int main()
 
     double energy = 0.5 * kev_to_joule;
     double vx = sqrt(2 * energy / mH);
-
+    cout<<"vx: "<<vx<<"  vy: "<<-vx/2<<"  vz: "<<-vx/2<<endl;
     Particle p(0.1 * cm, 0.5 * cm, 0.5 * cm, vx, -vx/2, -vx/2, qe, mH); // x, y, z, vx, vy, vz, q, m
     int res_t = 20000;
     double t_max = 4.0 * cm / p.v;
@@ -1252,7 +1252,7 @@ int main()
     Py_Initialize();
     PyRun_SimpleString("from mayavi import mlab\nimport numpy as np");
 
-    convert_and_inject_vectors(std::make_tuple(box.potential),
+    convert_and_inject_vectors(std::make_tuple(box.geometry),
                                std::make_tuple("box_potential"));
 
     convert_and_inject_variables(std::make_tuple(nx, ny, nz, lx, ly, lz),

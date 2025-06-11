@@ -1,0 +1,13 @@
+{
+  "electrodes": [
+    {
+      "A": 0.0,
+      "B": 0.0,
+      "C": 1.0,
+      "D": -0.1,
+      "thickness": 0.01,
+      "type": "Plate",
+      "potential": -2000.0
+    }
+  ]
+}
